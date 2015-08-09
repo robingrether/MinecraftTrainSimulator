@@ -1,0 +1,72 @@
+name: MinecraftTrainSimulator
+main: de.robingrether.mcts.MinecraftTrainSimulator
+version: 1.0.4
+author: Robingrether
+prefix: MCTS
+commands:
+   mcts:
+      description: Create and control your trains.
+      usage: /mcts
+      permission: MCTS.control
+      permission-message: You don't have permission.
+   df:
+      usage: /df
+      permission: MCTS.direction
+      permission-message: You don't have permission.
+   dn:
+      usage: /dn
+      permission: MCTS.direction
+      permission-message: You don't have permission.
+   db:
+      usage: /db
+      permission: MCTS.direction
+      permission-message: You don't have permission.
+   p4:
+      usage: /p4
+      permission: MCTS.accelerate
+      permission-message: You don't have permission.
+   p3:
+      usage: /p3
+      permission: MCTS.accelerate
+      permission-message: You don't have permission.
+   p2:
+      usage: /p2
+      permission: MCTS.accelerate
+      permission-message: You don't have permission.
+   p1:
+      usage: /p1
+      permission: MCTS.accelerate
+      permission-message: You don't have permission.
+   neutral:
+      usage: /neutral
+      permission: MCTS.accelerate
+      permission-message: You don't have permission.
+   b1:
+      usage: /b1
+      permission: MCTS.accelerate
+      permission-message: You don't have permission.
+   b2:
+      usage: /b2
+      permission: MCTS.accelerate
+      permission-message: You don't have permission.
+   b3:
+      usage: /b3
+      permission: MCTS.accelerate
+      permission-message: You don't have permission.
+   b4:
+      usage: /b4
+      permission: MCTS.accelerate
+      permission-message: You don't have permission.
+permissions:
+   MCTS.*:
+      default: op
+      children:
+         MCTS.control: true
+         MCTS.direction: true
+         MCTS.accelerate: true
+   MCTS.control:
+      default: op
+   MCTS.direction:
+      default: op
+   MCTS.accelerate:
+      default: op
