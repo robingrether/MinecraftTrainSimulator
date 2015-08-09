@@ -188,7 +188,6 @@ public class Train {
 	
 	private void initTrainProperties() {
 		TrainProperties properties = minecarts.getProperties();
-		properties.mobCollision = CollisionMode.PUSH;
 		properties.playerCollision = CollisionMode.PUSH;
 		properties.miscCollision = CollisionMode.PUSH;
 		properties.trainCollision = CollisionMode.PUSH;
