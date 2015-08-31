@@ -1,16 +1,19 @@
 package de.robingrether.mcts;
 
 import java.util.HashSet;
+
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+
 import com.bergerkiller.bukkit.tc.CollisionMode;
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
 import com.bergerkiller.bukkit.tc.controller.MinecartMember;
 import com.bergerkiller.bukkit.tc.controller.MinecartMemberStore;
 import com.bergerkiller.bukkit.tc.properties.TrainProperties;
+
 import de.robingrether.mcts.render.TrainMapRenderer;
 
 public class Train {
@@ -165,14 +168,18 @@ public class Train {
 		this.status = status;
 	}
 	
-	public void consumeFuel() {
-		if(fuel > 0) {
-			fuel--;
+	public boolean consumeFuel() {
+		fuel -= status;
+		if(fuel < 0) {
+			fuel = 0;
+			return false;
+		} else {
+			return true;
 		}
 	}
 	
 	public boolean hasFuel() {
-		return fuel > 0;
+		return fuel - status >= 0;
 	}
 	
 	public void terminate() {
