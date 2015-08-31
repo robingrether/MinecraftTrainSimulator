@@ -47,7 +47,11 @@ public class Accelerator extends TrainThread {
 				if(!(force > maxVelocity)) {
 					force += acceleration;
 					if(force > maxVelocity) {
-						force = maxVelocity;
+						if(force - acceleration > maxVelocity) {
+							force -= acceleration;
+						} else {
+							force = maxVelocity;
+						}
 					}
 				}
 				minecarts.setForwardForce(force);
