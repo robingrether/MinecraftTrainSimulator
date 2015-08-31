@@ -13,8 +13,8 @@ import org.bukkit.Bukkit;
 
 public class Images {
 	
-	private static Image[] images = new Image[4];
-	private static final String[] files = {"banner.png", "display.png", "fire_off.png", "fire_on.png"};
+	private static Image[] images = new Image[6];
+	private static final String[] files = {"banner.png", "display.png", "fire_off.png", "fire_on.png", "power_off.png", "power_on.png"};
 	
 	public static void init() {
 		try {
