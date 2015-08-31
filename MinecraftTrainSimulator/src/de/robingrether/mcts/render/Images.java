@@ -5,7 +5,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+
 import javax.imageio.ImageIO;
+
+import org.bukkit.Bukkit;
 
 public class Images {
 	
@@ -28,7 +32,7 @@ public class Images {
 				images[i] = ImageIO.read(getInputStream(files[i]));
 			}
 		} catch(Exception e) {
-			e.printStackTrace();
+			Bukkit.getPluginManager().getPlugin("MinecraftTrainSimulator").getLogger().log(Level.SEVERE, "Cannot load image files.", e);
 		}
 	}
 	

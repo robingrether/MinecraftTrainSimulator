@@ -2,6 +2,8 @@ package de.robingrether.mcts;
 
 import java.io.File;
 import java.util.LinkedList;
+import java.util.logging.Level;
+
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -9,8 +11,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import com.bergerkiller.bukkit.tc.TrainCarts;
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
+
 import de.robingrether.mcts.Metrics.Graph;
 import de.robingrether.mcts.Metrics.Plotter;
 import de.robingrether.mcts.render.Images;
@@ -42,13 +46,13 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 		} catch(Exception e) {
 		}
 		instance = this;
-		System.out.println("[MCTS] MinecraftTrainSimulator v" + getDescription().getVersion() + " enabled!");
+		getLogger().log(Level.INFO, "MinecraftTrainSimulator v" + getDescription().getVersion() + " enabled!");
 	}
 	
 	public void onDisable() {
 		terminateTrains();
 		instance = null;
-		System.out.println("[MCTS] MinecraftTrainSimulator v" + getDescription().getVersion() + " disabled!");
+		getLogger().log(Level.INFO, "MinecraftTrainSimulator v" + getDescription().getVersion() + " disabled!");
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
