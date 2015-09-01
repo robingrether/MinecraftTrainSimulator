@@ -27,6 +27,7 @@ import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
 import de.robingrether.mcts.Metrics.Graph;
 import de.robingrether.mcts.Metrics.Plotter;
 import de.robingrether.mcts.render.Images;
+import de.robingrether.util.StringUtil;
 
 public class MinecraftTrainSimulator extends JavaPlugin {
 	
@@ -116,7 +117,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 					} else {
 						if(args.length < 2) {
 							sender.sendMessage(ChatColor.RED + "Wrong usage: /mcts create <coal/electric>");
-						} else if(args[1].equalsIgnoreCase("coal")) { // TODO: add other arguments
+						} else if(StringUtil.equalsIgnoreCase(args[1], "coal", "steam")) {
 							MinecartGroup minecarts = MinecartGroup.get(player.getVehicle());
 							if(getTrain(minecarts) == null) {
 								Train train = new SteamTrain(minecarts, createNewMap(player.getWorld()));
