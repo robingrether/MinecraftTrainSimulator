@@ -52,13 +52,30 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 		try {
 			metrics = new Metrics(this);
 			Graph graph1 = metrics.createGraph("Trains");
-			graph1.addPlotter(new Plotter("Trains") {
+			graph1.addPlotter(new Plotter("steam trains") {
 				public int getValue() {
-					return trains.size();
+					int count = 0;
+					for(Train train : trains) {
+						if(train instanceof SteamTrain) {
+							count++;
+						}
+					}
+					return count;
+				}
+			});
+			graph1.addPlotter(new Plotter("electric trains") {
+				public int getValue() {
+					int count = 0;
+					for(Train train : trains) {
+						if(train instanceof ElectricTrain) {
+							count++;
+						}
+					}
+					return count;
 				}
 			});
 			Graph graph2 = metrics.createGraph("Substations");
-			graph2.addPlotter(new Plotter("Substations") {
+			graph2.addPlotter(new Plotter("substations") {
 				public int getValue() {
 					return substations.size();
 				}
