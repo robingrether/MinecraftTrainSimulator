@@ -289,6 +289,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 						substations.put(substation.getName(), substation);
 					}
 				}
+				reader.close();
 			} catch(Exception e) {
 				getLogger().log(Level.SEVERE, "Cannot load substations.", e);
 			}
