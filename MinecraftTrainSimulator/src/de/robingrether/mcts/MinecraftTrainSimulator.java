@@ -1,13 +1,16 @@
 package de.robingrether.mcts;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,22 +20,27 @@ import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
 
 import de.robingrether.mcts.Metrics.Graph;
 import de.robingrether.mcts.Metrics.Plotter;
+import de.robingrether.mcts.io.SLAPI;
 import de.robingrether.mcts.render.Images;
 
 public class MinecraftTrainSimulator extends JavaPlugin {
 	
+	public static final File directory = new File("plugins/MinecraftTrainSimulator");
 	private static MinecraftTrainSimulator instance;
+	
 	private LinkedList<Train> trains = new LinkedList<Train>();
+	HashMap<String, Substation> substations = new HashMap<String, Substation>();
+	private MCTSListener listener;
 	private Metrics metrics;
 	
 	public void onEnable() {
 		if(TrainCarts.maxVelocity < 1.0) {
 			TrainCarts.maxVelocity = 1.0;
 		}
-		getServer().getPluginManager().registerEvents(new MCTSListener(), this);
-		if(!new File("plugins/MinecraftTrainSimulator").isDirectory()) {
-			new File("plugins/MinecraftTrainSimulator").mkdirs();
-		}
+		listener = new MCTSListener(this);
+		getServer().getPluginManager().registerEvents(listener, this);
+		checkDirectory();
+		loadData();
 		Images.init();
 		try {
 			metrics = new Metrics(this);
@@ -51,6 +59,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	
 	public void onDisable() {
 		terminateTrains();
+		saveData();
 		instance = null;
 		getLogger().log(Level.INFO, "MinecraftTrainSimulator v" + getDescription().getVersion() + " disabled!");
 	}
@@ -71,13 +80,17 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 						sender.sendMessage(ChatColor.RED + "You are not in a train.");
 					} else {
 						Train train = getTrain(player);
-						if(Train.isFuel(player.getItemInHand().getType())) {
-							int fuel = player.getItemInHand().getAmount() * 1200;
-							train.addFuel(fuel);
-							player.setItemInHand(null);
-							sender.sendMessage(ChatColor.GOLD + "Added fuel to the train.");
+						if(train instanceof SteamTrain) {
+							if(SteamTrain.isFuel(player.getItemInHand().getType())) {
+								int fuel = player.getItemInHand().getAmount() * 1200;
+								train.addFuel(fuel);
+								player.setItemInHand(null);
+								sender.sendMessage(ChatColor.GOLD + "Added fuel to the train.");
+							} else {
+								sender.sendMessage(ChatColor.RED + "You have to hold coal in your hand.");
+							}
 						} else {
-							sender.sendMessage(ChatColor.RED + "You have to hold coal in your hand.");
+							sender.sendMessage(ChatColor.RED + "Electric trains don't need fuel.");
 						}
 					}
 				} else if(args[0].equalsIgnoreCase("control")) {
@@ -93,14 +106,25 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 						}
 					}
 				} else if(args[0].equalsIgnoreCase("create")) {
-					if(player.getVehicle() == null) {
+					if(!(player.getVehicle() instanceof Minecart)) {
 						sender.sendMessage(ChatColor.RED + "You have to be in a cart to create a train.");
 					} else {
-						MinecartGroup minecarts = MinecartGroup.get(player.getVehicle());
-						if(getTrain(minecarts) == null) {
-							Train train = new Train(minecarts, createNewMap(player.getWorld()));
-							trains.add(train);
-							sender.sendMessage(ChatColor.GOLD + "Created train.");
+						if(args.length < 2) {
+							sender.sendMessage(ChatColor.RED + "Wrong usage: /mcts create <coal/electric>");
+						} else if(args[1].equalsIgnoreCase("coal")) { // TODO: add other arguments
+							MinecartGroup minecarts = MinecartGroup.get(player.getVehicle());
+							if(getTrain(minecarts) == null) {
+								Train train = new SteamTrain(minecarts, createNewMap(player.getWorld()));
+								trains.add(train);
+								sender.sendMessage(ChatColor.GOLD + "Created steam train.");
+							}
+						} else if(args[1].equalsIgnoreCase("electric")) {
+							MinecartGroup minecarts = MinecartGroup.get(player.getVehicle());
+							if(getTrain(minecarts) == null) {
+								Train train = new ElectricTrain(minecarts, createNewMap(player.getWorld()));
+								trains.add(train);
+								sender.sendMessage(ChatColor.GOLD + "Created electric train.");
+							}
 						}
 					}
 				} else if(args[0].equalsIgnoreCase("fuel")) {
@@ -108,10 +132,61 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 						sender.sendMessage(ChatColor.RED + "You are not in a train.");
 					} else {
 						Train train = getTrain(player);
-						sender.sendMessage(ChatColor.GOLD + "Fuel level: " + train.getFuel());
+						if(train instanceof SteamTrain) {
+							sender.sendMessage(ChatColor.GOLD + "Fuel level: " + train.getFuel());
+						} else {
+							sender.sendMessage(ChatColor.GOLD + "Has energy: " + (train.hasFuel() ? "yes" : "no"));
+						}
 					}
 				} else {
 					sendHelp(player);
+				}
+			}
+			return true;
+		} else if(cmd.getName().equalsIgnoreCase("substation")) {
+			if(player == null) {
+				sender.sendMessage(ChatColor.RED + "This command can only be executed as player.");
+			} else {
+				if(args.length == 0) {
+					sendHelp(player);
+				} else if(args[0].equalsIgnoreCase("create")) {
+					if(args.length < 3) {
+						sender.sendMessage(ChatColor.RED + "Wrong usage: /substation create <name> <voltage>");
+					} else {
+						if(substations.containsKey(args[1].toLowerCase(Locale.ENGLISH))) {
+							sender.sendMessage(ChatColor.RED + "That name is already used.");
+						} else {
+							try {
+								int voltage = Integer.parseInt(args[2]);
+								if(voltage > 0) {
+									Substation substation = new Substation(args[1].toLowerCase(Locale.ENGLISH), voltage);
+									listener.substations.put(player.getName().toLowerCase(Locale.ENGLISH), substation);
+									sender.sendMessage(ChatColor.GOLD + "Place a redstone block one blocks away from your rails.");
+								} else {
+									sender.sendMessage(ChatColor.RED + "The voltage may not be 0 or less.");
+								}
+							} catch(NumberFormatException e) {
+								sender.sendMessage(ChatColor.RED + "The voltage must be a valid integer.");
+							}
+						}
+					}
+				} else if(args[0].equalsIgnoreCase("list")) {
+					sender.sendMessage(ChatColor.AQUA + "Substations");
+					for(Substation substation : substations.values()) {
+						sender.sendMessage(ChatColor.GOLD + " '" + substation.getName() + "' (" + (substation.isTurnedOn() ? ChatColor.GREEN + "on" : ChatColor.RED + "off") + ChatColor.GOLD + ") at " + substation.getLocationString());
+					}
+				} else if(args[0].equalsIgnoreCase("remove")) {
+					if(args.length < 2) {
+						sender.sendMessage(ChatColor.RED + "Wrong usage: /substation remove <name>");
+					} else {
+						Substation substation = substations.remove(args[1].toLowerCase(Locale.ENGLISH));
+						if(substation == null) {
+							sender.sendMessage(ChatColor.RED + "There is no substation called '" + args[1] + "'");
+						} else {
+							substation.delete();
+							sender.sendMessage(ChatColor.GOLD + "Removed substation '" + args[1] + "'");
+						}
+					}
 				}
 			}
 			return true;
@@ -190,6 +265,23 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 		}
 	}
 	
+	private void checkDirectory() {
+		if(!directory.isDirectory()) {
+			directory.mkdir();
+		}
+	}
+	
+	private void loadData() {
+		File dataFile = new File(directory, "data.bin");
+		if(dataFile.exists()) {
+			
+		}
+	}
+	
+	private void saveData() {
+		File dataFile = new File(directory, "data.bin");
+	}
+	
 	public Train getTrain(Player player) {
 		return getTrain(player, false);
 	}
@@ -231,10 +323,13 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	
 	private void sendHelp(Player player) {
 		player.sendMessage(ChatColor.AQUA + "MinecraftTrainSimulator - Help");
-		player.sendMessage(ChatColor.GOLD + " /mcts addfuel - Add fuel to a train");
-		player.sendMessage(ChatColor.GOLD + " /mcts control - Control a train");
-		player.sendMessage(ChatColor.GOLD + " /mcts create  - Create a train");
-		player.sendMessage(ChatColor.GOLD + " /mcts fuel    - See a train's fuel level");
+		player.sendMessage(ChatColor.GOLD + " /mcts addfuel                       - Add fuel to a train");
+		player.sendMessage(ChatColor.GOLD + " /mcts control                       - Control a train");
+		player.sendMessage(ChatColor.GOLD + " /mcts create <coal/electric>        - Create a train");
+		player.sendMessage(ChatColor.GOLD + " /mcts fuel                          - See a train's fuel level");
+		player.sendMessage(ChatColor.GOLD + " /substation create <name> <voltage> - Create a substation");
+		player.sendMessage(ChatColor.GOLD + " /substation list                    - List all substations");
+		player.sendMessage(ChatColor.GOLD + " /substation remove <name>           - Remove a substation");
 		player.sendMessage(ChatColor.GOLD + " /df  /dn  /db - Change the direction");
 		player.sendMessage(ChatColor.GOLD + " /p4  /p3  /p2  /p1  /neutral  /b1  /b2  /b3  /b4");
 		player.sendMessage(ChatColor.GOLD + " - Control the accelerator and brake");
