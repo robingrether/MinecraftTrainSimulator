@@ -1,13 +1,15 @@
 package de.robingrether.mcts;
 
-import java.io.Serializable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.material.Lever;
 
-public class Substation implements Serializable {
-	
-	private static final long serialVersionUID = 6001418474808541475L;
+public class Substation {
 	
 	private final Location[] blocks = new Location[9];
 	private final String name;
@@ -116,6 +118,38 @@ public class Substation implements Serializable {
 			return String.format("%s (%s, %s, %s)", blocks[0].getWorld().getName(), blocks[0].getBlockX(), blocks[0].getBlockY(), blocks[0].getBlockZ());
 		} else {
 			return "no position, still in creation";
+		}
+	}
+	
+	public String toString() {
+		return String.format("%s %s (%s) - %s (%s, %s, %s), (%s, %s, %s)", name, voltage, isTurnedOn() ? "on" : "off", blocks[0].getWorld().getName(), blocks[0].getBlockX(), blocks[0].getBlockY(), blocks[0].getBlockZ(), blocks[3].getBlockX(), blocks[3].getBlockY(), blocks[3].getBlockZ());
+	}
+	
+	private static Pattern pattern = Pattern.compile("^(.+) ([0-9]+) \\((off|on)\\) - (.+) \\((-?[0-9]+), (-?[0-9]+), (-?[0-9]+)\\), \\((-?[0-9]+), (-?[0-9]+), (-?[0-9]+)\\)");
+	
+	public static Substation fromString(String source) {
+		Matcher matcher = pattern.matcher(source);
+		if(matcher.matches()) {
+			Substation substation = new Substation(matcher.group(1), Integer.parseInt(matcher.group(2)));
+			World world = Bukkit.getWorld(matcher.group(4));
+			if(world == null) {
+				return null;
+			} else {
+				substation.placeRedstoneBlock(new Location(world, Integer.parseInt(matcher.group(5)), Integer.parseInt(matcher.group(6)), Integer.parseInt(matcher.group(7))));
+				substation.placeFence(new Location(world, Integer.parseInt(matcher.group(8)), Integer.parseInt(matcher.group(9)), Integer.parseInt(matcher.group(10))));
+				switch(matcher.group(3)) {
+					case "on":
+						substation.turnOn();
+						substation.blocks[2].getBlock().setData((byte)13);
+						break;
+					case "off":
+						substation.turnOff();
+						break;
+				}
+				return substation;
+			}
+		} else {
+			return null;
 		}
 	}
 	
