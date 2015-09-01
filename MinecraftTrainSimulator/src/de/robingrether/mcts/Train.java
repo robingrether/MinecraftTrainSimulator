@@ -1,9 +1,6 @@
 package de.robingrether.mcts;
 
-import java.util.HashSet;
-
 import org.bukkit.Effect;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
@@ -16,25 +13,22 @@ import com.bergerkiller.bukkit.tc.properties.TrainProperties;
 
 import de.robingrether.mcts.render.TrainMapRenderer;
 
-public class Train {
+public abstract class Train {
 	
-	private static final HashSet<Material> fuels = new HashSet<Material>();
 	private MinecartGroup minecarts;
 	private Player leader;
-	private int fuel;
 	private int direction;
 	private TrainThread thread;
-	private int status;
-	private MapView map;
+	protected int status;
+	private MapView controlPanel;
 	
-	public Train(MinecartGroup minecarts, MapView map) {
+	protected Train(MinecartGroup minecarts, MapView controlPanel) {
 		this.minecarts = minecarts;
 		this.leader = null;
-		this.fuel = 0;
 		this.direction = 0;
 		this.thread = null;
 		this.status = 0;
-		this.map = map;
+		this.controlPanel = controlPanel;
 		initTrainProperties();
 		initMap();
 	}
@@ -43,15 +37,9 @@ public class Train {
 		return minecarts;
 	}
 	
-	public void addFuel(int fuel) {
-		if(fuel > 0) {
-			this.fuel += fuel;
-		}
-	}
+	public abstract boolean addFuel(int fuel);
 	
-	public int getFuel() {
-		return fuel;
-	}
+	public abstract int getFuel();
 	
 	public Player getLeader() {
 		return leader;
@@ -168,19 +156,9 @@ public class Train {
 		this.status = status;
 	}
 	
-	public boolean consumeFuel() {
-		fuel -= status;
-		if(fuel < 0) {
-			fuel = 0;
-			return false;
-		} else {
-			return true;
-		}
-	}
+	public abstract boolean consumeFuel();
 	
-	public boolean hasFuel() {
-		return fuel - status >= 0;
-	}
+	public abstract boolean hasFuel();
 	
 	public void terminate() {
 		if(thread != null) {
@@ -190,7 +168,7 @@ public class Train {
 	
 	@Deprecated
 	public short getMapId() {
-		return map.getId();
+		return controlPanel.getId();
 	}
 	
 	private void initTrainProperties() {
@@ -202,22 +180,10 @@ public class Train {
 	}
 	
 	private void initMap() {
-		for(MapRenderer renderer : map.getRenderers()) {
-			map.removeRenderer(renderer);
+		for(MapRenderer renderer : controlPanel.getRenderers()) {
+			controlPanel.removeRenderer(renderer);
 		}
-		map.addRenderer(new TrainMapRenderer(this));
-	}
-	
-	public static boolean isFuel(Material material) {
-		return fuels.contains(material);
-	}
-	
-	public static boolean newFuel(Material material) {
-		return fuels.add(material);
-	}
-	
-	static {
-		newFuel(Material.COAL);
+		controlPanel.addRenderer(new TrainMapRenderer(this));
 	}
 	
 }
