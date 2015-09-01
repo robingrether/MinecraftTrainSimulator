@@ -36,6 +36,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	
 	private LinkedList<Train> trains = new LinkedList<Train>();
 	HashMap<String, Substation> substations = new HashMap<String, Substation>();
+	
 	private MCTSListener listener;
 	private Metrics metrics;
 	
@@ -50,10 +51,16 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 		Images.init();
 		try {
 			metrics = new Metrics(this);
-			Graph graph = metrics.createGraph("Trains");
-			graph.addPlotter(new Plotter("Trains") {
+			Graph graph1 = metrics.createGraph("Trains");
+			graph1.addPlotter(new Plotter("Trains") {
 				public int getValue() {
 					return trains.size();
+				}
+			});
+			Graph graph2 = metrics.createGraph("Substations");
+			graph2.addPlotter(new Plotter("Substations") {
+				public int getValue() {
+					return substations.size();
 				}
 			});
 			metrics.start();
