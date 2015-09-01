@@ -9,6 +9,11 @@ commands:
       usage: /mcts
       permission: MCTS.control
       permission-message: You don't have permission.
+   substation:
+      description: Create and control substations.
+      usage: /substation
+      permission: MCTS.substation
+      permission-message: You are not allowed to do this.
    df:
       usage: /df
       permission: MCTS.direction
