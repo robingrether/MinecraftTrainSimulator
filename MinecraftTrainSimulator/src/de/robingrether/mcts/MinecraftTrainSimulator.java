@@ -1,6 +1,12 @@
 package de.robingrether.mcts;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Locale;
@@ -20,7 +26,6 @@ import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
 
 import de.robingrether.mcts.Metrics.Graph;
 import de.robingrether.mcts.Metrics.Plotter;
-import de.robingrether.mcts.io.SLAPI;
 import de.robingrether.mcts.render.Images;
 
 public class MinecraftTrainSimulator extends JavaPlugin {
@@ -272,14 +277,35 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	}
 	
 	private void loadData() {
-		File dataFile = new File(directory, "data.bin");
+		File dataFile = new File(directory, "substations.dat");
 		if(dataFile.exists()) {
-			
+			try {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(dataFile)));
+				String line;
+				while((line = reader.readLine()) != null) {
+					Substation substation = Substation.fromString(line);
+					if(substation != null) {
+						substations.put(substation.getName(), substation);
+					}
+				}
+			} catch(Exception e) {
+				getLogger().log(Level.SEVERE, "Cannot load substations.", e);
+			}
 		}
 	}
 	
 	private void saveData() {
-		File dataFile = new File(directory, "data.bin");
+		File dataFile = new File(directory, "substations.dat");
+		try {
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dataFile)));
+			for(Substation substation : substations.values()) {
+				writer.write(substation.toString() + "\n");
+			}
+			writer.flush();
+			writer.close();
+		} catch(Exception e) {
+			getLogger().log(Level.SEVERE, "Cannot save substations.", e);
+		}
 	}
 	
 	public Train getTrain(Player player) {
