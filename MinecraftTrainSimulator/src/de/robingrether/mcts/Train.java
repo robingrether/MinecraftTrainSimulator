@@ -15,7 +15,7 @@ import de.robingrether.mcts.render.TrainMapRenderer;
 
 public abstract class Train {
 	
-	private MinecartGroup minecarts;
+	protected MinecartGroup minecarts;
 	private Player leader;
 	private int direction;
 	private TrainThread thread;
@@ -159,6 +159,10 @@ public abstract class Train {
 	public abstract boolean consumeFuel();
 	
 	public abstract boolean hasFuel();
+	
+	public boolean isAccelerating() {
+		return thread instanceof Accelerator && hasFuel();
+	}
 	
 	public void terminate() {
 		if(thread != null) {

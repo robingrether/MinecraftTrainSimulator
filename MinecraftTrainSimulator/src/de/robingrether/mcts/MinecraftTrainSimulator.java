@@ -7,13 +7,20 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Minecart;
@@ -34,13 +41,15 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	public static final File directory = new File("plugins/MinecraftTrainSimulator");
 	private static MinecraftTrainSimulator instance;
 	
-	private LinkedList<Train> trains = new LinkedList<Train>();
-	HashMap<String, Substation> substations = new HashMap<String, Substation>();
+	private Set<Train> trains = new HashSet<Train>();
+	Map<String, Substation> substations = new ConcurrentHashMap<String, Substation>();
+	Set<Location> catenary;
 	
 	private MCTSListener listener;
 	private Metrics metrics;
 	
 	public void onEnable() {
+		instance = this;
 		if(TrainCarts.maxVelocity < 1.0) {
 			TrainCarts.maxVelocity = 1.0;
 		}
@@ -83,7 +92,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 			metrics.start();
 		} catch(Exception e) {
 		}
-		instance = this;
+		updateCatenary();
 		getLogger().log(Level.INFO, "MinecraftTrainSimulator v" + getDescription().getVersion() + " enabled!");
 	}
 	
@@ -147,6 +156,8 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 								Train train = new SteamTrain(minecarts, createNewMap(player.getWorld()));
 								trains.add(train);
 								sender.sendMessage(ChatColor.GOLD + "Created steam train.");
+							} else {
+								sender.sendMessage(ChatColor.RED + "This already is a train.");
 							}
 						} else if(args[1].equalsIgnoreCase("electric")) {
 							MinecartGroup minecarts = MinecartGroup.get(player.getVehicle());
@@ -154,7 +165,11 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 								Train train = new ElectricTrain(minecarts, createNewMap(player.getWorld()));
 								trains.add(train);
 								sender.sendMessage(ChatColor.GOLD + "Created electric train.");
+							} else {
+								sender.sendMessage(ChatColor.RED + "This already is a train.");
 							}
+						} else {
+							sender.sendMessage(ChatColor.RED + "Wrong usage: /mcts create <coal/electric>");
 						}
 					}
 				} else if(args[0].equalsIgnoreCase("fuel")) {
@@ -203,7 +218,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 				} else if(args[0].equalsIgnoreCase("list")) {
 					sender.sendMessage(ChatColor.AQUA + "Substations");
 					for(Substation substation : substations.values()) {
-						sender.sendMessage(ChatColor.GOLD + " '" + substation.getName() + "' (" + (substation.isTurnedOn() ? ChatColor.GREEN + "on" : ChatColor.RED + "off") + ChatColor.GOLD + ") at " + substation.getLocationString());
+						sender.sendMessage(ChatColor.GOLD + " '" + substation.getName() + "' " + substation.getVoltage() + "V (" + (substation.isTurnedOn() ? ChatColor.GREEN + "on" : ChatColor.RED + "off") + ChatColor.GOLD + ") at " + substation.getLocationString());
 					}
 				} else if(args[0].equalsIgnoreCase("remove")) {
 					if(args.length < 2) {
@@ -332,6 +347,37 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 		} catch(Exception e) {
 			getLogger().log(Level.SEVERE, "Cannot save substations.", e);
 		}
+	}
+	
+	public void updateCatenary() {
+		catenary = new HashSet<Location>();
+		for(Substation substation : substations.values()) {
+			if(!substation.isTurnedOn()) {
+				continue;
+			}
+			Set<Block> tested = new HashSet<Block>(), to_test;
+			int distance = 1;
+			catenary.add(substation.getIronFenceLocation());
+			tested.add(substation.getIronFenceLocation().getBlock());
+			while(distance < substation.getVoltage() / 10) {
+				to_test = new HashSet<Block>();
+				for(Block block : tested) {
+					to_test.addAll(Arrays.asList(getNeighbors(block)));
+				}
+				tested = new HashSet<Block>();
+				for(Block block : to_test) {
+					if(block.getType().equals(Material.IRON_FENCE)) {
+						catenary.add(block.getLocation());
+						tested.add(block);
+					}
+				}
+				distance++;
+			}
+		}
+	}
+	
+	private Block[] getNeighbors(Block block) {
+		return new Block[]{block.getRelative(BlockFace.UP), block.getRelative(BlockFace.DOWN), block.getRelative(BlockFace.EAST), block.getRelative(BlockFace.WEST), block.getRelative(BlockFace.NORTH), block.getRelative(BlockFace.SOUTH)};
 	}
 	
 	public Train getTrain(Player player) {

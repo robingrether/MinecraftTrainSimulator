@@ -25,10 +25,12 @@ public class Substation {
 	
 	public void turnOn() {
 		state = true;
+		MinecraftTrainSimulator.getInstance().updateCatenary();
 	}
 	
 	public void turnOff() {
 		state = false;
+		MinecraftTrainSimulator.getInstance().updateCatenary();
 	}
 	
 	public boolean isTurnedOn() {
@@ -73,6 +75,14 @@ public class Substation {
 	
 	public boolean isLeverAt(Location location) {
 		return blocks[2].equals(location);
+	}
+	
+	public Location getRedstoneBlockLocation() {
+		return blocks[0].clone();
+	}
+	
+	public Location getIronFenceLocation() {
+		return blocks[7].clone();
 	}
 	
 	public boolean placeFence(Location location) {

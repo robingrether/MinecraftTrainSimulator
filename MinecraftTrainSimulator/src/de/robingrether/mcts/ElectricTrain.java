@@ -3,6 +3,7 @@ package de.robingrether.mcts;
 import org.bukkit.map.MapView;
 
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
+import com.bergerkiller.bukkit.tc.controller.MinecartMember;
 
 public class ElectricTrain extends Train {
 	
@@ -15,15 +16,25 @@ public class ElectricTrain extends Train {
 	}
 	
 	public boolean consumeFuel() {
-		return false; // TODO: check for powered
+		for(MinecartMember<?> minecart : minecarts) {
+			if(MinecraftTrainSimulator.getInstance().catenary.contains(minecart.getBlock(0, 2, 0).getLocation())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public int getFuel() {
-		return 0; // TODO: check for powered
+		return 0;
 	}
 	
 	public boolean hasFuel() {
-		return false; // TODO: check for powered
+		for(MinecartMember<?> minecart : minecarts) {
+			if(MinecraftTrainSimulator.getInstance().catenary.contains(minecart.getBlock(0, 2, 0).getLocation())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 }

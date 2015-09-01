@@ -1,7 +1,8 @@
 package de.robingrether.mcts;
 
-import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,6 +23,7 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
 
@@ -30,7 +32,7 @@ import de.robingrether.util.ObjectUtil;
 public class MCTSListener implements Listener {
 	
 	private MinecraftTrainSimulator plugin;
-	HashMap<String, Substation> substations = new HashMap<String, Substation>();
+	Map<String, Substation> substations = new ConcurrentHashMap<String, Substation>();
 	
 	public MCTSListener(MinecraftTrainSimulator plugin) {
 		this.plugin = plugin;
@@ -53,12 +55,19 @@ public class MCTSListener implements Listener {
 				if(substations.containsKey(player.getName().toLowerCase(Locale.ENGLISH))) {
 					Substation substation = substations.get(player.getName().toLowerCase(Locale.ENGLISH));
 					if(substation.isRedstoneBlockPlaced()) {
-						substation.placeFence(placed.getLocation());
-						plugin.substations.put(substation.getName(), substation);
-						substations.remove(player.getName().toLowerCase(Locale.ENGLISH));
-						player.sendMessage(ChatColor.GOLD + "Created substation. Move the lever to turn it on.");
+						if(ObjectUtil.equals(substation.getRedstoneBlockLocation().subtract(placed.getLocation()).toVector(), new Vector(1, 0, 0), new Vector(-1, 0, 0), new Vector(0, 0, 1), new Vector(0, 0, -1))) {
+							substation.placeFence(placed.getLocation());
+							plugin.substations.put(substation.getName(), substation);
+							substations.remove(player.getName().toLowerCase(Locale.ENGLISH));
+							player.sendMessage(ChatColor.GOLD + "Created substation. Move the lever to turn it on.");
+						} else {
+							event.setCancelled(true);
+							player.sendMessage(ChatColor.RED + "The fence must be next to the redstone block.");
+						}
 					}
 				}
+			} else if(placed.getType().equals(Material.IRON_FENCE)) {
+				plugin.updateCatenary();
 			}
 		}
 	}
@@ -77,6 +86,9 @@ public class MCTSListener implements Listener {
 						player.sendMessage(ChatColor.GOLD + "You removed that substation.");
 					}
 				}
+			}
+			if(broken.getType().equals(Material.IRON_FENCE)) {
+				plugin.updateCatenary();
 			}
 		}
 	}
