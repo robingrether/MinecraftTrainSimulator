@@ -206,7 +206,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 								if(voltage > 0) {
 									Substation substation = new Substation(args[1].toLowerCase(Locale.ENGLISH), voltage);
 									listener.substations.put(player.getName().toLowerCase(Locale.ENGLISH), substation);
-									sender.sendMessage(ChatColor.GOLD + "Place a redstone block one blocks away from your rails.");
+									sender.sendMessage(ChatColor.GOLD + "Place a redstone block with a distance of one block next to your rails.");
 								} else {
 									sender.sendMessage(ChatColor.RED + "The voltage may not be 0 or less.");
 								}
