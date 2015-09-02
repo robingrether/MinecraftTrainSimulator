@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -317,35 +318,41 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	}
 	
 	private void loadData() {
-		File dataFile = new File(directory, "substations.dat");
-		if(dataFile.exists()) {
-			try {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(dataFile)));
-				String line;
-				while((line = reader.readLine()) != null) {
-					Substation substation = Substation.fromString(line);
-					if(substation != null) {
-						substations.put(substation.getName(), substation);
+		for(World world : Bukkit.getWorlds()) {
+			File dataFile = new File(directory, "substations-" + world.getName() + ".dat");
+			if(dataFile.exists()) {
+				try {
+					BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(dataFile)));
+					String line;
+					while((line = reader.readLine()) != null) {
+						Substation substation = Substation.fromString(line);
+						if(substation != null) {
+							substations.put(substation.getName(), substation);
+						}
 					}
+					reader.close();
+				} catch(Exception e) {
+					getLogger().log(Level.SEVERE, "Cannot load substations.", e);
 				}
-				reader.close();
-			} catch(Exception e) {
-				getLogger().log(Level.SEVERE, "Cannot load substations.", e);
 			}
 		}
 	}
 	
 	private void saveData() {
-		File dataFile = new File(directory, "substations.dat");
-		try {
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dataFile)));
-			for(Substation substation : substations.values()) {
-				writer.write(substation.toString() + "\n");
+		for(World world : Bukkit.getWorlds()) {
+			File dataFile = new File(directory, "substations-" + world.getName() + ".dat");
+			try {
+				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dataFile)));
+				for(Substation substation : substations.values()) {
+					if(world.equals(substation.getRedstoneBlockLocation().getWorld())) {
+						writer.write(substation.toString() + "\n");
+					}
+				}
+				writer.flush();
+				writer.close();
+			} catch(Exception e) {
+				getLogger().log(Level.SEVERE, "Cannot save substations.", e);
 			}
-			writer.flush();
-			writer.close();
-		} catch(Exception e) {
-			getLogger().log(Level.SEVERE, "Cannot save substations.", e);
 		}
 	}
 	
