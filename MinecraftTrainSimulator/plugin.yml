@@ -1,6 +1,6 @@
 name: MinecraftTrainSimulator
 main: de.robingrether.mcts.MinecraftTrainSimulator
-version: 1.0.5
+version: 2.0.1
 author: Robingrether
 prefix: MCTS
 commands:
@@ -8,7 +8,7 @@ commands:
       description: Create and control your trains.
       usage: /mcts
       permission: MCTS.control
-      permission-message: You don't have permission.
+      permission-message: You are not allowed to do this.
    substation:
       description: Create and control substations.
       usage: /substation
@@ -17,51 +17,51 @@ commands:
    df:
       usage: /df
       permission: MCTS.direction
-      permission-message: You don't have permission.
+      permission-message: You are not allowed to do this.
    dn:
       usage: /dn
       permission: MCTS.direction
-      permission-message: You don't have permission.
+      permission-message: You are not allowed to do this.
    db:
       usage: /db
       permission: MCTS.direction
-      permission-message: You don't have permission.
+      permission-message: You are not allowed to do this.
    p4:
       usage: /p4
       permission: MCTS.accelerate
-      permission-message: You don't have permission.
+      permission-message: You are not allowed to do this.
    p3:
       usage: /p3
       permission: MCTS.accelerate
-      permission-message: You don't have permission.
+      permission-message: You are not allowed to do this.
    p2:
       usage: /p2
       permission: MCTS.accelerate
-      permission-message: You don't have permission.
+      permission-message: You are not allowed to do this.
    p1:
       usage: /p1
       permission: MCTS.accelerate
-      permission-message: You don't have permission.
+      permission-message: You are not allowed to do this.
    neutral:
       usage: /neutral
       permission: MCTS.accelerate
-      permission-message: You don't have permission.
+      permission-message: You are not allowed to do this.
    b1:
       usage: /b1
       permission: MCTS.accelerate
-      permission-message: You don't have permission.
+      permission-message: You are not allowed to do this.
    b2:
       usage: /b2
       permission: MCTS.accelerate
-      permission-message: You don't have permission.
+      permission-message: You are not allowed to do this.
    b3:
       usage: /b3
       permission: MCTS.accelerate
-      permission-message: You don't have permission.
+      permission-message: You are not allowed to do this.
    b4:
       usage: /b4
       permission: MCTS.accelerate
-      permission-message: You don't have permission.
+      permission-message: You are not allowed to do this.
 permissions:
    MCTS.*:
       default: op
@@ -69,9 +69,12 @@ permissions:
          MCTS.control: true
          MCTS.direction: true
          MCTS.accelerate: true
+         MCTS.substation: true
    MCTS.control:
       default: op
    MCTS.direction:
       default: op
    MCTS.accelerate:
+      default: op
+   MCTS.substation:
       default: op
