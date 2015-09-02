@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
+import javax.persistence.GeneratedValue;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -94,14 +96,14 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 		} catch(Exception e) {
 		}
 		updateCatenary();
-		getLogger().log(Level.INFO, "MinecraftTrainSimulator v" + getDescription().getVersion() + " enabled!");
+		getLogger().log(Level.INFO, getFullName() + " enabled!");
 	}
 	
 	public void onDisable() {
 		terminateTrains();
 		saveData();
 		instance = null;
-		getLogger().log(Level.INFO, "MinecraftTrainSimulator v" + getDescription().getVersion() + " disabled!");
+		getLogger().log(Level.INFO, getFullName() + " disabled!");
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -311,6 +313,10 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 		}
 	}
 	
+	public String getFullName() {
+		return "MinecraftTrainSimulator " + getDescription().getVersion();
+	}
+	
 	private void checkDirectory() {
 		if(!directory.isDirectory()) {
 			directory.mkdir();
@@ -427,7 +433,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	}
 	
 	private void sendHelp(Player player) {
-		player.sendMessage(ChatColor.AQUA + "MinecraftTrainSimulator - Help");
+		player.sendMessage(ChatColor.AQUA + getFullName() + " - Help");
 		player.sendMessage(ChatColor.GOLD + " /mcts addfuel                       - Add fuel to a train");
 		player.sendMessage(ChatColor.GOLD + " /mcts control                       - Control a train");
 		player.sendMessage(ChatColor.GOLD + " /mcts create <coal/electric>        - Create a train");
