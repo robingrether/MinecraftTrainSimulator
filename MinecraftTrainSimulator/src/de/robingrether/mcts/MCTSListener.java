@@ -84,6 +84,7 @@ public class MCTSListener implements Listener {
 						plugin.substations.remove(substation.getName());
 						event.setCancelled(true);
 						player.sendMessage(ChatColor.GOLD + "You removed that substation.");
+						plugin.updateCatenary();
 					}
 				}
 			}

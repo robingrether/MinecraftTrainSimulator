@@ -15,8 +15,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-import javax.persistence.GeneratedValue;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -234,6 +232,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 							substation.delete();
 							sender.sendMessage(ChatColor.GOLD + "Removed substation '" + args[1] + "'");
 						}
+						updateCatenary();
 					}
 				}
 			}
