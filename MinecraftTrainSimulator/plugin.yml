@@ -1,6 +1,6 @@
 name: MinecraftTrainSimulator
 main: de.robingrether.mcts.MinecraftTrainSimulator
-version: 2.0.1
+version: 2.0.2
 author: Robingrether
 prefix: MCTS
 commands:
