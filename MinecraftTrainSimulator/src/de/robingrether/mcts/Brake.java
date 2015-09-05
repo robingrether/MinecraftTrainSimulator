@@ -16,20 +16,10 @@ public class Brake extends TrainThread {
 	
 	public void run() {
 		MinecartGroup minecarts = train.getMinecarts();
-		boolean addFuel = false;
 		while(execute) {
-			double force = minecarts.getAverageForce();
+			double force = Math.abs(minecarts.getAverageForce());
 			force -= braking;
-			if(force < 0.0) {
-				force = 0.0;
-			}
-			minecarts.setForwardForce(force);
-			if(force > 0.0) {
-				if(addFuel) {
-					train.addFuel(1);
-				}
-				addFuel = !addFuel;
-			}
+			minecarts.setForwardForce(force * (minecarts.getAverageForce() > 0 ? 1 : minecarts.getAverageForce() < 0 ? -1 : 0));
 			try {
 				sleep(100L);
 			} catch(InterruptedException e) {
