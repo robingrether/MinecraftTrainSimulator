@@ -67,7 +67,7 @@ public class MCTSListener implements Listener {
 					}
 				}
 			} else if(placed.getType().equals(Material.IRON_FENCE)) {
-				plugin.updateCatenary();
+				Bukkit.getScheduler().runTaskLater(plugin, new UpdateCatenaryRunnable(), 1L);
 			}
 		}
 	}
@@ -77,6 +77,9 @@ public class MCTSListener implements Listener {
 		if(!event.isCancelled()) {
 			Block broken = event.getBlock();
 			Player player = event.getPlayer();
+			if(broken.getType().equals(Material.IRON_FENCE)) {
+				Bukkit.getScheduler().runTaskLater(plugin, new UpdateCatenaryRunnable(), 1L);
+			}
 			if(ObjectUtil.equals(broken.getType(), Material.FENCE, Material.BIRCH_FENCE, Material.ACACIA_FENCE, Material.DARK_OAK_FENCE, Material.JUNGLE_FENCE, Material.SPRUCE_FENCE, Material.NETHER_FENCE, Material.REDSTONE_BLOCK, Material.IRON_FENCE, Material.IRON_BLOCK, Material.LEVER)) {
 				for(Substation substation : plugin.substations.values()) {
 					if(substation.isAt(broken.getLocation())) {
@@ -84,12 +87,9 @@ public class MCTSListener implements Listener {
 						plugin.substations.remove(substation.getName());
 						event.setCancelled(true);
 						player.sendMessage(ChatColor.GOLD + "You removed that substation.");
-						plugin.updateCatenary();
+						Bukkit.getScheduler().runTaskLater(plugin, new UpdateCatenaryRunnable(), 1L);
 					}
 				}
-			}
-			if(broken.getType().equals(Material.IRON_FENCE)) {
-				plugin.updateCatenary();
 			}
 		}
 	}
@@ -131,7 +131,7 @@ public class MCTSListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onVehicleEnter(VehicleEnterEvent event) {
 		if(!event.isCancelled()) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleEnterRunnable(event), 10L);
+			Bukkit.getScheduler().runTaskLater(plugin, new VehicleEnterRunnable(event), 10L);
 		}
 	}
 	
@@ -148,7 +148,15 @@ public class MCTSListener implements Listener {
 		}
 	}
 	
-	public class VehicleEnterRunnable implements Runnable {
+	private class UpdateCatenaryRunnable implements Runnable {
+		
+		public void run() {
+			plugin.updateCatenary();
+		}
+		
+	}
+	
+	private class VehicleEnterRunnable implements Runnable {
 		
 		private VehicleEnterEvent event;
 		
