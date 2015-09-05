@@ -19,42 +19,18 @@ public class Accelerator extends TrainThread {
 	
 	public void run() {
 		MinecartGroup minecarts = train.getMinecarts();
-		boolean accelerate = true;
 		while(execute) {
-			if(train.getDirection() == 1) {
-				if(!minecarts.head().equals(MinecartMemberStore.get(train.getLeader().getVehicle()))) {
-					if(minecarts.getAverageForce() < 0.02) {
-						minecarts.reverse();
-						accelerate = true;
-					} else {
-						minecarts.stop();
-						accelerate = false;
-					}
-				}
-			} else if(train.getDirection() == -1) {
-				if(minecarts.head().equals(MinecartMemberStore.get(train.getLeader().getVehicle()))) {
-					if(minecarts.getAverageForce() < 0.02) {
-						minecarts.reverse();
-						accelerate = true;
-					} else {
-						minecarts.stop();
-						accelerate = false;
-					}
-				}
-			}
-			if(accelerate && train.getDirection() != 0 && train.hasFuel()) {
+			boolean facingForward = minecarts.head().equals(MinecartMemberStore.get(train.getLeader().getVehicle()));
+			if(train.hasFuel()) {
 				double force = minecarts.getAverageForce();
-				if(!(force > maxVelocity)) {
-					force += acceleration;
-					if(force > maxVelocity) {
-						if(force - acceleration > maxVelocity) {
-							force -= acceleration;
-						} else {
-							force = maxVelocity;
-						}
+				if(!(Math.abs(force) > maxVelocity)) {
+					force += acceleration * train.getDirection() * (facingForward ? 1 : -1);
+					if(Math.abs(force) > maxVelocity) {
+						force = maxVelocity * train.getDirection() * (facingForward ? 1 : -1);
 					}
 				}
 				minecarts.setForwardForce(force);
+				minecarts.shareForce();
 				train.consumeFuel();
 			}
 			try {
