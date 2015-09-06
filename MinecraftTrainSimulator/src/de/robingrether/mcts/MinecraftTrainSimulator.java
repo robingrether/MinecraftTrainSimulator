@@ -32,6 +32,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.tc.TrainCarts;
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
+import com.bergerkiller.bukkit.tc.controller.MinecartMember;
+import com.bergerkiller.bukkit.tc.controller.type.MinecartMemberFurnace;
 
 import de.robingrether.mcts.Metrics.Graph;
 import de.robingrether.mcts.Metrics.Plotter;
@@ -154,7 +156,11 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 							sender.sendMessage(ChatColor.RED + "Wrong usage: /mcts create <coal/electric>");
 						} else if(StringUtil.equalsIgnoreCase(args[1], "coal", "steam")) {
 							MinecartGroup minecarts = MinecartGroup.get(player.getVehicle());
-							if(getTrain(minecarts) == null) {
+							if(!(getTrain(minecarts) == null)) {
+								sender.sendMessage(ChatColor.RED + "This already is a train.");	
+							} else if(!containsPoweredMinecart(minecarts)) {
+								sender.sendMessage(ChatColor.RED + "You must connect a powered minecart.");
+							} else {
 								Train train = new SteamTrain(minecarts, createNewMap(player.getWorld()));
 								trains.add(train);
 								sender.sendMessage(ChatColor.GOLD + "Created steam train.");
@@ -163,12 +169,14 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 								if(slot > -1) {
 									inventory.getItem(slot).setDurability(train.getMapId());
 								}
-							} else {
-								sender.sendMessage(ChatColor.RED + "This already is a train.");
 							}
 						} else if(args[1].equalsIgnoreCase("electric")) {
 							MinecartGroup minecarts = MinecartGroup.get(player.getVehicle());
-							if(getTrain(minecarts) == null) {
+							if(!(getTrain(minecarts) == null)) {
+								sender.sendMessage(ChatColor.RED + "This already is a train.");	
+							} else if(!containsPoweredMinecart(minecarts)) {
+								sender.sendMessage(ChatColor.RED + "You must connect a powered minecart.");
+							} else {
 								Train train = new ElectricTrain(minecarts, createNewMap(player.getWorld()));
 								trains.add(train);
 								sender.sendMessage(ChatColor.GOLD + "Created electric train.");
@@ -177,8 +185,6 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 								if(slot > -1) {
 									inventory.getItem(slot).setDurability(train.getMapId());
 								}
-							} else {
-								sender.sendMessage(ChatColor.RED + "This already is a train.");
 							}
 						} else {
 							sender.sendMessage(ChatColor.RED + "Wrong usage: /mcts create <coal/electric>");
@@ -370,6 +376,15 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 				getLogger().log(Level.SEVERE, "Cannot save substations.", e);
 			}
 		}
+	}
+	
+	private boolean containsPoweredMinecart(MinecartGroup minecarts) {
+		for(MinecartMember<?> minecart : minecarts) {
+			if(minecart instanceof MinecartMemberFurnace) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void updateCatenary() {
