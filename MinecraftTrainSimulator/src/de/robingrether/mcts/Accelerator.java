@@ -1,7 +1,9 @@
 package de.robingrether.mcts;
 
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
+import com.bergerkiller.bukkit.tc.controller.MinecartMember;
 import com.bergerkiller.bukkit.tc.controller.MinecartMemberStore;
+import com.bergerkiller.bukkit.tc.controller.type.MinecartMemberFurnace;
 
 public class Accelerator extends TrainThread {
 	
@@ -29,8 +31,11 @@ public class Accelerator extends TrainThread {
 						force = maxVelocity * train.getDirection() * (facingForward ? 1 : -1);
 					}
 				}
-				minecarts.setForwardForce(force);
-				minecarts.shareForce();
+				for(MinecartMember<?> minecart : minecarts) {
+					if(minecart instanceof MinecartMemberFurnace) {
+						minecart.setForwardForce(force);
+					}
+				}
 				train.consumeFuel();
 			}
 			try {
