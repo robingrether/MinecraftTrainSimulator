@@ -107,19 +107,19 @@ public abstract class Train {
 			switch(status) {
 				case 1:
 					maxVelocity = 0.2;
-					acceleration = 0.01;
+					acceleration = 0.02;
 					break;
 				case 2:
 					maxVelocity = 0.4;
-					acceleration = 0.02;
+					acceleration = 0.04;
 					break;
 				case 3:
 					maxVelocity = 0.7;
-					acceleration = 0.035;
+					acceleration = 0.07;
 					break;
 				case 4:
 					maxVelocity = 1.0;
-					acceleration= 0.05;
+					acceleration= 0.1;
 					break;
 			}
 			if(maxVelocity > 0 && acceleration > 0) {
@@ -133,16 +133,16 @@ public abstract class Train {
 			double braking = 0.0;
 			switch(status) {
 				case -1:
-					braking = 0.001;
+					braking = 0.0005;
 					break;
 				case -2:
-					braking = 0.002;
+					braking = 0.001;
 					break;
 				case -3:
-					braking = 0.0035;
+					braking = 0.00175;
 					break;
 				case -4:
-					braking = 0.005;
+					braking = 0.0025;
 					break;
 			}
 			if(braking > 0) {
