@@ -4,6 +4,7 @@ import org.bukkit.Effect;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.bergerkiller.bukkit.tc.CollisionMode;
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
@@ -18,7 +19,7 @@ public abstract class Train {
 	protected MinecartGroup minecarts;
 	private Player leader;
 	private int direction;
-	private TrainThread thread;
+	private BukkitRunnable thread;
 	protected int status;
 	private MapView controlPanel;
 	
@@ -116,7 +117,7 @@ public abstract class Train {
 				if(leader != null && playEffect) {
 					leader.getWorld().playEffect(leader.getLocation(), Effect.DOOR_TOGGLE, 0);
 				}
-				thread.start();
+				thread.runTaskTimer(MinecraftTrainSimulator.getInstance(), 1L, 1L);
 			}
 		} else if(status < 0) {
 			double braking = 0.0;
@@ -139,7 +140,7 @@ public abstract class Train {
 				if(leader != null && playEffect) {
 					leader.getWorld().playEffect(leader.getLocation(), Effect.DOOR_TOGGLE, 0);
 				}
-				thread.start();
+				thread.runTaskTimer(MinecraftTrainSimulator.getInstance(), 2L, 2L);
 			}
 		}
 		this.status = status;
@@ -155,7 +156,7 @@ public abstract class Train {
 	
 	public void terminate() {
 		if(thread != null) {
-			thread.terminate();
+			thread.cancel();
 		}
 	}
 	
