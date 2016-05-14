@@ -125,7 +125,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 						Train train = getTrain(player);
 						if(train instanceof SteamTrain) {
 							if(SteamTrain.isFuel(player.getItemInHand().getType())) {
-								int fuel = player.getItemInHand().getAmount() * 1200;
+								int fuel = player.getItemInHand().getAmount() * 2000;
 								train.addFuel(fuel);
 								player.setItemInHand(null);
 								sender.sendMessage(ChatColor.GOLD + "Added fuel to the train.");

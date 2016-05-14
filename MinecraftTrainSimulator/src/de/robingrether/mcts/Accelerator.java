@@ -8,13 +8,11 @@ import com.bergerkiller.bukkit.tc.controller.type.MinecartMemberFurnace;
 public class Accelerator extends TrainThread {
 	
 	private Train train;
-	private double maxVelocity;
 	private double acceleration;
 	private boolean execute;
 	
-	public Accelerator(Train train, double maxVelocity, double acceleration) {
+	public Accelerator(Train train, double acceleration) {
 		this.train = train;
-		this.maxVelocity = maxVelocity;
 		this.acceleration = acceleration;
 		this.execute = true;
 	}
@@ -24,22 +22,17 @@ public class Accelerator extends TrainThread {
 		while(execute) {
 			boolean facingForward = minecarts.head().equals(MinecartMemberStore.get(train.getLeader().getVehicle()));
 			if(train.hasFuel()) {
-				double force = minecarts.getAverageForce();
-				if(!(Math.abs(force) > maxVelocity)) {
-					force += acceleration * train.getDirection() * (facingForward ? 1 : -1);
-					if(Math.abs(force) > maxVelocity) {
-						force = maxVelocity * train.getDirection() * (facingForward ? 1 : -1);
-					}
-				}
+				double force = minecarts.getAverageForce() * (facingForward ? 1 : -1);
+				force += acceleration * train.getDirection();
 				for(MinecartMember<?> minecart : minecarts) {
 					if(minecart instanceof MinecartMemberFurnace) {
-						minecart.setForwardForce(force);
+						minecart.setForwardForce(force * (facingForward ? 1 : -1));
 					}
 				}
 				train.consumeFuel();
 			}
 			try {
-				sleep(100L);
+				sleep(50L);
 			} catch(InterruptedException e) {
 			}
 		}

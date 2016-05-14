@@ -52,12 +52,6 @@ public abstract class Train {
 			return true;
 		} else if(minecarts.tail().equals(minecart)) {
 			this.leader = player;
-			if(minecarts.getAverageForce() < 0.02) {
-				minecarts.reverse();
-			} else {
-				minecarts.stop();
-				minecarts.reverse();
-			}
 			return true;
 		}
 		return false;
@@ -102,28 +96,23 @@ public abstract class Train {
 		}
 		terminate();
 		if(status > 0) {
-			double maxVelocity = 0.0;
 			double acceleration = 0.0;
 			switch(status) {
 				case 1:
-					maxVelocity = 0.2;
-					acceleration = 0.02;
+					acceleration = 0.005;
 					break;
 				case 2:
-					maxVelocity = 0.4;
-					acceleration = 0.04;
+					acceleration = 0.01;
 					break;
 				case 3:
-					maxVelocity = 0.7;
-					acceleration = 0.07;
+					acceleration = 0.0175;
 					break;
 				case 4:
-					maxVelocity = 1.0;
-					acceleration= 0.1;
+					acceleration= 0.0275;
 					break;
 			}
-			if(maxVelocity > 0 && acceleration > 0) {
-				thread = new Accelerator(this, maxVelocity, acceleration);
+			if(acceleration > 0) {
+				thread = new Accelerator(this, acceleration);
 				if(leader != null && playEffect) {
 					leader.getWorld().playEffect(leader.getLocation(), Effect.DOOR_TOGGLE, 0);
 				}
