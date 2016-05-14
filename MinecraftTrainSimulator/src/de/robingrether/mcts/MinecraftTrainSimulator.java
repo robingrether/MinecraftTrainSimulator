@@ -163,6 +163,9 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 							} else {
 								Train train = new SteamTrain(minecarts, createNewMap(player.getWorld()));
 								trains.add(train);
+								if(train.canLead(player)) {
+									train.setLeader(player);
+								}
 								sender.sendMessage(ChatColor.GOLD + "Created steam train.");
 								PlayerInventory inventory = player.getInventory();
 								int slot = inventory.first(Material.MAP);
@@ -179,6 +182,9 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 							} else {
 								Train train = new ElectricTrain(minecarts, createNewMap(player.getWorld()));
 								trains.add(train);
+								if(train.canLead(player)) {
+									train.setLeader(player);
+								}
 								sender.sendMessage(ChatColor.GOLD + "Created electric train.");
 								PlayerInventory inventory = player.getInventory();
 								int slot = inventory.first(Material.MAP);
