@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
+import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -35,14 +36,12 @@ import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
 import com.bergerkiller.bukkit.tc.controller.MinecartMember;
 import com.bergerkiller.bukkit.tc.controller.type.MinecartMemberFurnace;
 
-import de.robingrether.mcts.Metrics.Graph;
-import de.robingrether.mcts.Metrics.Plotter;
 import de.robingrether.mcts.render.Images;
 import de.robingrether.util.StringUtil;
 
 public class MinecraftTrainSimulator extends JavaPlugin {
 	
-	public static final File directory = new File("plugins/MinecraftTrainSimulator");
+	public static File directory;
 	private static MinecraftTrainSimulator instance;
 	
 	private Set<Train> trains = new HashSet<Train>();
@@ -54,6 +53,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	
 	public void onEnable() {
 		instance = this;
+		directory = getDataFolder();
 		if(TrainCarts.maxVelocity < 1.0) {
 			TrainCarts.maxVelocity = 1.0;
 		}
@@ -62,40 +62,34 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 		checkDirectory();
 		loadData();
 		Images.init();
-		try {
-			metrics = new Metrics(this);
-			Graph graph1 = metrics.createGraph("Trains");
-			graph1.addPlotter(new Plotter("steam trains") {
-				public int getValue() {
-					int count = 0;
-					for(Train train : trains) {
-						if(train instanceof SteamTrain) {
-							count++;
-						}
-					}
-					return count;
-				}
-			});
-			graph1.addPlotter(new Plotter("electric trains") {
-				public int getValue() {
-					int count = 0;
-					for(Train train : trains) {
-						if(train instanceof ElectricTrain) {
-							count++;
-						}
-					}
-					return count;
-				}
-			});
-			Graph graph2 = metrics.createGraph("Substations");
-			graph2.addPlotter(new Plotter("substations") {
-				public int getValue() {
-					return substations.size();
-				}
-			});
-			metrics.start();
-		} catch(Exception e) {
-		}
+		metrics = new Metrics(this);
+		metrics.addCustomChart(new Metrics.SingleLineChart("steamTrains") {
+			
+			public int getValue() {
+				int c = 0;
+				for(Train train : trains)
+					if(train instanceof SteamTrain) c++;
+				return c;
+			}
+			
+		});
+		metrics.addCustomChart(new Metrics.SingleLineChart("electricTrains") {
+			
+			public int getValue() {
+				int c = 0;
+				for(Train train : trains)
+					if(train instanceof ElectricTrain) c++;
+				return c;
+			}
+			
+		});
+		metrics.addCustomChart(new Metrics.SingleLineChart("substations") {
+			
+			public int getValue() {
+				return substations.size();
+			}
+			
+		});
 		updateCatenary();
 		getLogger().log(Level.INFO, getFullName() + " enabled!");
 	}

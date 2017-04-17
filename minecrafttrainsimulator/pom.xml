@@ -11,6 +11,10 @@
   		<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
   	</repository>
   	<repository>
+  		<id>bstats-repo</id>
+  		<url>http://repo.bstats.org/content/repositories/releases/</url>
+  	</repository>
+  	<repository>
   		<id>robingrether-repo</id>
   		<url>http://repo.robingrether.de/</url>
   	</repository>
@@ -22,6 +26,12 @@
   		<artifactId>spigot-api</artifactId>
   		<version>1.11.2-R0.1-SNAPSHOT</version>
   		<scope>provided</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.bstats</groupId>
+  		<artifactId>bstats-bukkit</artifactId>
+  		<version>1.1</version>
+  		<scope>compile</scope>
   	</dependency>
   	<dependency>
   		<groupId>de.robingrether.util</groupId>
@@ -54,6 +64,32 @@
   				<source>1.7</source>
   				<target>1.7</target>
   			</configuration>
+  		</plugin>
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-shade-plugin</artifactId>
+  			<version>2.3</version>
+  			<configuration>
+  				<artifactSet>
+  					<includes>
+  						<include>org.bstats:*</include>
+  					</includes>
+  				</artifactSet>
+  				<relocations>
+  					<relocation>
+  						<pattern>org.bstats</pattern>
+  						<shadedPattern>de.robingrether.mcts.bstats</shadedPattern>
+  					</relocation>
+  				</relocations>
+  			</configuration>
+  			<executions>
+  				<execution>
+  					<phase>package</phase>
+  					<goals>
+  						<goal>shade</goal>
+  					</goals>
+  				</execution>
+  			</executions>
   		</plugin>
   	</plugins>
   	<extensions>
