@@ -3,7 +3,7 @@ main: de.robingrether.mcts.MinecraftTrainSimulator
 version: 2.0.2
 author: RobinGrether
 prefix: MCTS
-depend: [BKCommonLib, TrainCarts]
+depend: [BKCommonLib, Train_Carts]
 commands:
    mcts:
       description: Create and control your trains.
