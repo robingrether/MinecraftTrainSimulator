@@ -19,6 +19,10 @@ public class Accelerator extends BukkitRunnable {
 	
 	public void run() {
 		MinecartGroup minecarts = train.getMinecarts();
+		if(minecarts.isEmpty()) {
+			train.terminate();
+			return;
+		}
 		boolean facingForward = minecarts.head().equals(MinecartMemberStore.get(train.getLeader().getVehicle()));
 		if(train.hasFuel()) {
 			double force = minecarts.getAverageForce() * (facingForward ? 1 : -1);

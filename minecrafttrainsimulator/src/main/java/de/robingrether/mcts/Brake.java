@@ -16,6 +16,10 @@ public class Brake extends BukkitRunnable {
 	
 	public void run() {
 		MinecartGroup minecarts = train.getMinecarts();
+		if(minecarts.isEmpty()) {
+			train.terminate();
+			return;
+		}
 		double force = Math.abs(minecarts.getAverageForce());
 		force -= braking;
 		minecarts.setForwardForce(force * (minecarts.getAverageForce() > 0 ? 1 : minecarts.getAverageForce() < 0 ? -1 : 0));
