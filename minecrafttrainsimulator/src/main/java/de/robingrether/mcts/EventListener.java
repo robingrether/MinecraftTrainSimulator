@@ -29,12 +29,12 @@ import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
 
 import de.robingrether.util.ObjectUtil;
 
-public class MCTSListener implements Listener {
+public class EventListener implements Listener {
 	
 	private MinecraftTrainSimulator plugin;
 	Map<String, Substation> substations = new ConcurrentHashMap<String, Substation>();
 	
-	public MCTSListener(MinecraftTrainSimulator plugin) {
+	public EventListener(MinecraftTrainSimulator plugin) {
 		this.plugin = plugin;
 	}
 	

@@ -48,7 +48,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	Map<String, Substation> substations = new ConcurrentHashMap<String, Substation>();
 	Set<Location> catenary;
 	
-	private MCTSListener listener;
+	private EventListener listener;
 	private Metrics metrics;
 	
 	public void onEnable() {
@@ -57,7 +57,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 		if(TrainCarts.maxVelocity < 1.0) {
 			TrainCarts.maxVelocity = 1.0;
 		}
-		listener = new MCTSListener(this);
+		listener = new EventListener(this);
 		getServer().getPluginManager().registerEvents(listener, this);
 		checkDirectory();
 		loadData();
