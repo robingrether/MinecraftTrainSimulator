@@ -91,7 +91,6 @@
   						<shadedPattern>de.robingrether.mcts.bstats</shadedPattern>
   					</relocation>
   				</relocations>
-  				<createDependencyReducedPom>false</createDependencyReducedPom>
   			</configuration>
   			<executions>
   				<execution>
