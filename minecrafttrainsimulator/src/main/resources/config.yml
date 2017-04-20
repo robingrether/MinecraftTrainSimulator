@@ -1,0 +1,17 @@
+# Settings affecting the status panel rendering
+status-panel:
+   
+   # Unit of speed to show
+   # Supported units are: kmh (kilometres per hour), mph (miles per hour), mps (metres per second), bpt (blocks per tick)
+   # Defaults to kilometres per hour, if the given value is invalid
+   unit-of-speed: UNIT_OF_SPEED
+
+# Settings affecting the update checking feature
+updates:
+   
+   # Check whether an update is available at every server start
+   # Admins might get 'MCTS.update' permission to also trigger an update check and receive a notification if an update is available
+   check: UPDATE_CHECK
+   
+   # Automatically download a new update after checking whether one is available
+   download: UPDATE_DOWNLOAD

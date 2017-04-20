@@ -71,6 +71,7 @@ permissions:
          MCTS.direction: true
          MCTS.accelerate: true
          MCTS.substation: true
+         MCTS.update: true
    MCTS.control:
       default: op
    MCTS.direction:
@@ -78,4 +79,6 @@ permissions:
    MCTS.accelerate:
       default: op
    MCTS.substation:
+      default: op
+   MCTS.update:
       default: op
