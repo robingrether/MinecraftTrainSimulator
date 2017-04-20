@@ -160,7 +160,6 @@ public abstract class Train {
 		}
 	}
 	
-	@Deprecated
 	public short getMapId() {
 		return controlPanel.getId();
 	}

@@ -2,8 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.robingrether.mcts</groupId>
   <artifactId>minecrafttrainsimulator</artifactId>
-  <version>2.0.2</version>
+  <version>2.1.1-SNAPSHOT</version>
   <name>MinecraftTrainSimulator</name>
+  
+  <properties>
+  	<maven.build.timestamp.format>yyyy_MM_dd-HH_mm_ss</maven.build.timestamp.format>
+  </properties>
   
   <repositories>
   	<repository>
@@ -36,7 +40,7 @@
   	<dependency>
   		<groupId>de.robingrether.util</groupId>
   		<artifactId>utility</artifactId>
-  		<version>1.0.0</version>
+  		<version>1.0.1</version>
   		<scope>compile</scope>
   	</dependency>
   	<dependency>
@@ -56,6 +60,12 @@
   </dependencies>
   
   <build>
+  	<resources>
+  		<resource>
+  			<directory>src/main/resources</directory>
+  			<filtering>true</filtering>
+  		</resource>
+  	</resources>
   	<plugins>
   		<plugin>
   			<artifactId>maven-compiler-plugin</artifactId>
@@ -81,6 +91,7 @@
   						<shadedPattern>de.robingrether.mcts.bstats</shadedPattern>
   					</relocation>
   				</relocations>
+  				<createDependencyReducedPom>false</createDependencyReducedPom>
   			</configuration>
   			<executions>
   				<execution>
