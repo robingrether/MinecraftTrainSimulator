@@ -73,7 +73,7 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.11.2-R0.1-SNAPSHOT</version>
+      <version>1.12-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -91,10 +91,6 @@
         <exclusion>
           <artifactId>gson</artifactId>
           <groupId>com.google.code.gson</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>ebean</artifactId>
-          <groupId>org.avaje</groupId>
         </exclusion>
         <exclusion>
           <artifactId>snakeyaml</artifactId>
@@ -115,16 +111,16 @@
     <dependency>
       <groupId>com.bergerkiller.bukkit</groupId>
       <artifactId>BKCommonLib</artifactId>
-      <version>1.11.2-v1</version>
+      <version>1.12-v1</version>
       <scope>system</scope>
-      <systemPath>D:\Users\robin_000\Java\MinecraftTrainSimulator\minecrafttrainsimulator/../../workspace/Libraries/BKCommonLib-1.11.2-v1.jar</systemPath>
+      <systemPath>D:\Users\priva\Documents\Java\MinecraftTrainSimulator\minecrafttrainsimulator/../../workspace/Libraries/BKCommonLib-1.12-v1.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>com.bergerkiller.bukkit</groupId>
       <artifactId>TrainCarts</artifactId>
-      <version>1.11.2-v1</version>
+      <version>1.11.2-v2</version>
       <scope>system</scope>
-      <systemPath>D:\Users\robin_000\Java\MinecraftTrainSimulator\minecrafttrainsimulator/../../workspace/Libraries/TrainCarts-1.11.2-v1.jar</systemPath>
+      <systemPath>D:\Users\priva\Documents\Java\MinecraftTrainSimulator\minecrafttrainsimulator/../../workspace/Libraries/TrainCarts-1.11.2-v2.jar</systemPath>
     </dependency>
   </dependencies>
   <distributionManagement>

@@ -1,6 +1,7 @@
 package de.robingrether.mcts;
 
 import org.bukkit.Effect;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
@@ -47,21 +48,25 @@ public abstract class Train {
 	}
 	
 	public boolean setLeader(Player player) {
-		MinecartMember<?> minecart = MinecartMemberStore.get(player.getVehicle());
-		if(minecarts.head().equals(minecart)) {
-			this.leader = player;
-			return true;
-		} else if(minecarts.tail().equals(minecart)) {
-			this.leader = player;
-			return true;
+		if(player.getVehicle() instanceof Minecart) {
+			MinecartMember<?> minecart = MinecartMemberStore.convert((Minecart)player.getVehicle());
+			if(minecarts.head().equals(minecart)) {
+				this.leader = player;
+				return true;
+			} else if(minecarts.tail().equals(minecart)) {
+				this.leader = player;
+				return true;
+			}
 		}
 		return false;
 	}
 	
 	public boolean canLead(Player player) {
-		MinecartMember<?> minecart = MinecartMemberStore.get(player.getVehicle());
-		if(minecarts.head().equals(minecart) || minecarts.tail().equals(minecart)) {
-			 return true;
+		if(player.getVehicle() instanceof Minecart) {
+			MinecartMember<?> minecart = MinecartMemberStore.convert((Minecart)player.getVehicle());
+			if(minecarts.head().equals(minecart) || minecarts.tail().equals(minecart)) {
+				 return true;
+			}
 		}
 		return false;
 	}

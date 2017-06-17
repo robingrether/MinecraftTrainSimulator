@@ -1,5 +1,6 @@
 package de.robingrether.mcts;
 
+import org.bukkit.entity.Minecart;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
@@ -23,7 +24,8 @@ public class Accelerator extends BukkitRunnable {
 			train.terminate();
 			return;
 		}
-		boolean facingForward = minecarts.head().equals(MinecartMemberStore.get(train.getLeader().getVehicle()));
+		if(!(train.getLeader().getVehicle() instanceof Minecart)) return;
+		boolean facingForward = minecarts.head().equals(MinecartMemberStore.convert((Minecart)train.getLeader().getVehicle()));
 		if(train.hasFuel()) {
 			double force = minecarts.getAverageForce() * (facingForward ? 1 : -1);
 			force += acceleration * train.getDirection();
