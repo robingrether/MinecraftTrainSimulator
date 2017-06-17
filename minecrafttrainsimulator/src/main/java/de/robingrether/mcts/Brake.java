@@ -7,11 +7,11 @@ import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
 public class Brake extends BukkitRunnable {
 	
 	private Train train;
-	private double braking;
+	private int amplifier;
 	
-	public Brake(Train train, double braking) {
+	public Brake(Train train, int amplifier) {
 		this.train = train;
-		this.braking = braking;
+		this.amplifier = amplifier;
 	}
 	
 	public void run() {
@@ -21,7 +21,7 @@ public class Brake extends BukkitRunnable {
 			return;
 		}
 		double force = Math.abs(minecarts.getAverageForce());
-		force -= braking;
+		force -= 0.0005 * amplifier;
 		minecarts.setForwardForce(force * (minecarts.getAverageForce() > 0 ? 1 : minecarts.getAverageForce() < 0 ? -1 : 0));
 	}
 	

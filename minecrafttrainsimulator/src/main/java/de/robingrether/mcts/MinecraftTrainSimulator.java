@@ -54,9 +54,6 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 		directory = getDataFolder();
-		if(TrainCarts.maxVelocity < 1.0) {
-			TrainCarts.maxVelocity = 1.0;
-		}
 		listener = new EventListener(this);
 		getServer().getPluginManager().registerEvents(listener, this);
 		checkDirectory();

@@ -102,51 +102,17 @@ public abstract class Train {
 		}
 		terminate();
 		if(status > 0) {
-			double acceleration = 0.0;
-			switch(status) {
-				case 1:
-					acceleration = 0.005;
-					break;
-				case 2:
-					acceleration = 0.01;
-					break;
-				case 3:
-					acceleration = 0.0175;
-					break;
-				case 4:
-					acceleration= 0.0275;
-					break;
+			thread = new Accelerator(this, status);
+			if(leader != null && playEffect) {
+				leader.getWorld().playEffect(leader.getLocation(), Effect.DOOR_TOGGLE, 0);
 			}
-			if(acceleration > 0) {
-				thread = new Accelerator(this, acceleration);
-				if(leader != null && playEffect) {
-					leader.getWorld().playEffect(leader.getLocation(), Effect.DOOR_TOGGLE, 0);
-				}
-				thread.runTaskTimer(MinecraftTrainSimulator.getInstance(), 1L, 1L);
-			}
+			thread.runTaskTimer(MinecraftTrainSimulator.getInstance(), 1L, 1L);
 		} else if(status < 0) {
-			double braking = 0.0;
-			switch(status) {
-				case -1:
-					braking = 0.0005;
-					break;
-				case -2:
-					braking = 0.001;
-					break;
-				case -3:
-					braking = 0.00175;
-					break;
-				case -4:
-					braking = 0.0025;
-					break;
+			thread = new Brake(this, -status);
+			if(leader != null && playEffect) {
+				leader.getWorld().playEffect(leader.getLocation(), Effect.DOOR_TOGGLE, 0);
 			}
-			if(braking > 0) {
-				thread = new Brake(this, braking);
-				if(leader != null && playEffect) {
-					leader.getWorld().playEffect(leader.getLocation(), Effect.DOOR_TOGGLE, 0);
-				}
-				thread.runTaskTimer(MinecraftTrainSimulator.getInstance(), 2L, 2L);
-			}
+			thread.runTaskTimer(MinecraftTrainSimulator.getInstance(), 1L, 1L);
 		}
 		this.status = status;
 	}
@@ -154,6 +120,8 @@ public abstract class Train {
 	public abstract boolean consumeFuel();
 	
 	public abstract boolean hasFuel();
+	
+	public abstract double getSpeedLimit();
 	
 	public boolean isAccelerating() {
 		return thread instanceof Accelerator && hasFuel();
@@ -174,7 +142,6 @@ public abstract class Train {
 		properties.playerCollision = CollisionMode.PUSH;
 		properties.miscCollision = CollisionMode.PUSH;
 		properties.trainCollision = CollisionMode.PUSH;
-		properties.setSpeedLimit(1.0);
 	}
 	
 	private void initMap() {

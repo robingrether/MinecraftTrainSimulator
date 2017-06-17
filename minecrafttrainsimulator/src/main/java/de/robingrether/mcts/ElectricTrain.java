@@ -11,6 +11,10 @@ public class ElectricTrain extends Train {
 		super(minecarts, controlPanel);
 	}
 	
+	public double getSpeedLimit() {
+		return minecarts.getProperties().getSpeedLimit();
+	}
+	
 	public boolean addFuel(int fuel) {
 		return false;
 	}
