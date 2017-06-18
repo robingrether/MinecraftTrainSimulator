@@ -390,23 +390,26 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 			if(!substation.isTurnedOn()) {
 				continue;
 			}
-			Set<Block> tested = new HashSet<Block>(), to_test;
+			Set<Block> lastCatenary = new HashSet<Block>(), neighbors = new HashSet<Block>();
+			Set<Location> substationCatenary = new HashSet<Location>();
 			int distance = 1;
 			catenary.add(substation.getIronFenceLocation());
-			tested.add(substation.getIronFenceLocation().getBlock());
+			lastCatenary.add(substation.getIronFenceLocation().getBlock());
+			substationCatenary.add(substation.getIronFenceLocation());
 			while(distance < substation.getVoltage() / 10) {
-				to_test = new HashSet<Block>();
-				for(Block block : tested) {
-					to_test.addAll(Arrays.asList(getNeighbors(block)));
+				neighbors.clear();
+				for(Block block : lastCatenary) {
+					neighbors.addAll(Arrays.asList(getNeighbors(block)));
 				}
-				tested = new HashSet<Block>();
-				for(Block block : to_test) {
-					if(block.getType().equals(Material.IRON_FENCE) && !catenary.contains(block.getLocation())) {
+				lastCatenary.clear();
+				for(Block block : neighbors) {
+					if(block.getType().equals(Material.IRON_FENCE) && !substationCatenary.contains(block.getLocation())) {
 						catenary.add(block.getLocation());
-						tested.add(block);
+						lastCatenary.add(block);
+						substationCatenary.add(block.getLocation());
 					}
 				}
-				if(tested.isEmpty()) {
+				if(lastCatenary.isEmpty()) {
 					break;
 				}
 				distance++;
