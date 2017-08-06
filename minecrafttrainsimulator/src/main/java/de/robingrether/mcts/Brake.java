@@ -21,7 +21,7 @@ public class Brake extends BukkitRunnable {
 			return;
 		}
 		double force = Math.abs(minecarts.getAverageForce());
-		force -= 0.001 * amplifier;
+		force -= 0.0005 * amplifier;
 		minecarts.setForwardForce(force * (minecarts.getAverageForce() > 0 ? 1 : minecarts.getAverageForce() < 0 ? -1 : 0));
 	}
 	

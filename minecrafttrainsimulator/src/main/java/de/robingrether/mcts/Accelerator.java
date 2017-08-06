@@ -33,8 +33,9 @@ public class Accelerator extends BukkitRunnable {
 				for(MinecartMember<?> minecart : minecarts) {
 					if(minecart instanceof MinecartMemberFurnace) furnaceCarts++;
 				}
-				force += train.getSpeedLimit() * 0.01 * amplifier * train.getDirection() * (furnaceCarts < 4 ? furnaceCarts / 4.0 : 1.0);
-			} else {
+				force += train.getSpeedLimit() * 0.01 * amplifier * train.getDirection() * (furnaceCarts < 4 ? furnaceCarts / 2.0 : 2.0);
+			}
+			if(force > train.getSpeedLimit() * amplifier / 4.0) {
 				force = train.getSpeedLimit() * amplifier / 4.0;
 			}
 			minecarts.setForwardForce(force * (facingForward ? 1 : -1));
