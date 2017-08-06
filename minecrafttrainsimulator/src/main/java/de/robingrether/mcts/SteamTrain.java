@@ -16,10 +16,6 @@ public class SteamTrain extends Train {
 		this.fuel = 0;
 	}
 	
-	public double getSpeedLimit() {
-		return minecarts.getProperties().getSpeedLimit() * 0.8;
-	}
-	
 	public boolean addFuel(int fuel) {
 		if(fuel > 0) {
 			this.fuel += fuel;

@@ -23,6 +23,7 @@ public abstract class Train {
 	private BukkitRunnable thread;
 	protected int status;
 	private MapView controlPanel;
+	private double maxSpeed = 100.0;
 	
 	protected Train(MinecartGroup minecarts, MapView controlPanel) {
 		this.minecarts = minecarts;
@@ -121,7 +122,9 @@ public abstract class Train {
 	
 	public abstract boolean hasFuel();
 	
-	public abstract double getSpeedLimit();
+	public double getSpeedLimit() {
+		return maxSpeed;
+	}
 	
 	public boolean isAccelerating() {
 		return thread instanceof Accelerator && hasFuel();
@@ -142,6 +145,12 @@ public abstract class Train {
 		properties.playerCollision = CollisionMode.PUSH;
 		properties.miscCollision = CollisionMode.PUSH;
 		properties.trainCollision = CollisionMode.PUSH;
+		for(MinecartMember<?> minecart : minecarts) {
+			double maxSpeed = minecart.getEntity().getMaxSpeed();
+			if(maxSpeed < this.maxSpeed) {
+				this.maxSpeed = maxSpeed;
+			}
+		}
 	}
 	
 	private void initMap() {
