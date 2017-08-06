@@ -43,6 +43,7 @@
           <artifactSet>
             <includes>
               <include>org.bstats:*</include>
+              <include>de.robingrether.util:*</include>
             </includes>
           </artifactSet>
           <relocations>
@@ -101,12 +102,6 @@
           <groupId>net.md-5</groupId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>de.robingrether.util</groupId>
-      <artifactId>utility</artifactId>
-      <version>1.0.1</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.bergerkiller.bukkit</groupId>

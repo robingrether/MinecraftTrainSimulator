@@ -83,6 +83,7 @@
   				<artifactSet>
   					<includes>
   						<include>org.bstats:*</include>
+  						<include>de.robingrether.util:*</include>
   					</includes>
   				</artifactSet>
   				<relocations>
