@@ -31,12 +31,14 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.bergerkiller.bukkit.tc.TrainCarts;
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
 import com.bergerkiller.bukkit.tc.controller.MinecartMember;
 import com.bergerkiller.bukkit.tc.controller.type.MinecartMemberFurnace;
 
+import de.robingrether.mcts.io.Configuration;
 import de.robingrether.mcts.render.Images;
+import de.robingrether.mcts.render.TrainMapRenderer;
+import de.robingrether.mcts.render.UnitOfSpeed;
 import de.robingrether.util.StringUtil;
 
 public class MinecraftTrainSimulator extends JavaPlugin {
@@ -44,6 +46,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	public static File directory;
 	private static MinecraftTrainSimulator instance;
 	
+	private Configuration configuration;
 	private Set<Train> trains = new HashSet<Train>();
 	Map<String, Substation> substations = new ConcurrentHashMap<String, Substation>();
 	Set<Location> catenary;
@@ -57,8 +60,15 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 		listener = new EventListener(this);
 		getServer().getPluginManager().registerEvents(listener, this);
 		checkDirectory();
+		configuration = new Configuration(this);
+		configuration.loadData();
+		configuration.saveData();
 		loadData();
 		Images.init();
+		TrainMapRenderer.unitOfSpeed = UnitOfSpeed.fromString(configuration.UNIT_OF_SPEED);
+		if(TrainMapRenderer.unitOfSpeed == null) {
+			TrainMapRenderer.unitOfSpeed = UnitOfSpeed.KILOMETRES_PER_HOUR;
+		}
 		metrics = new Metrics(this);
 		metrics.addCustomChart(new Metrics.SingleLineChart("steamTrains") {
 			
