@@ -16,7 +16,7 @@ import de.robingrether.mcts.Train;
 public class TrainMapRenderer extends MapRenderer {
 	
 	private static final NumberFormat signedFormat = new DecimalFormat("+#;-#");
-	private static final NumberFormat speedFormat = new DecimalFormat("00#.# ");
+	private static final NumberFormat speedFormat = new DecimalFormat("##0.0 ");
 	public static UnitOfSpeed unitOfSpeed = UnitOfSpeed.KILOMETRES_PER_HOUR;
 	
 	private Train train;
