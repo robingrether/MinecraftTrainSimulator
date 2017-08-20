@@ -36,6 +36,7 @@ import com.bergerkiller.bukkit.tc.controller.MinecartMember;
 import com.bergerkiller.bukkit.tc.controller.type.MinecartMemberFurnace;
 
 import de.robingrether.mcts.io.Configuration;
+import de.robingrether.mcts.io.UpdateCheck;
 import de.robingrether.mcts.render.Images;
 import de.robingrether.mcts.render.TrainMapRenderer;
 import de.robingrether.mcts.render.UnitOfSpeed;
@@ -46,7 +47,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	public static File directory;
 	private static MinecraftTrainSimulator instance;
 	
-	private Configuration configuration;
+	Configuration configuration;
 	private Set<Train> trains = new HashSet<Train>();
 	Map<String, Substation> substations = new ConcurrentHashMap<String, Substation>();
 	Set<Location> catenary;
@@ -98,6 +99,9 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 			
 		});
 		updateCatenary();
+		if(configuration.UPDATE_CHECK) {
+			getServer().getScheduler().runTaskLaterAsynchronously(this, new UpdateCheck(this, getServer().getConsoleSender(), configuration.UPDATE_DOWNLOAD), 20L);
+		}
 		getLogger().log(Level.INFO, getFullName() + " enabled!");
 	}
 	
@@ -386,9 +390,11 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	}
 	
 	private boolean containsPoweredMinecart(MinecartGroup minecarts) {
-		for(MinecartMember<?> minecart : minecarts) {
-			if(minecart instanceof MinecartMemberFurnace) {
-				return true;
+		if(minecarts != null) {
+			for(MinecartMember<?> minecart : minecarts) {
+				if(minecart instanceof MinecartMemberFurnace) {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -482,6 +488,10 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 		player.sendMessage(ChatColor.GOLD + " /df  /dn  /db - Change the direction");
 		player.sendMessage(ChatColor.GOLD + " /p4  /p3  /p2  /p1  /neutral  /b1  /b2  /b3  /b4");
 		player.sendMessage(ChatColor.GOLD + " - Control the accelerator and brake");
+	}
+	
+	public File getPluginFile() {
+		return getFile();
 	}
 	
 	public static MinecraftTrainSimulator getInstance() {

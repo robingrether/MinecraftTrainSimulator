@@ -19,6 +19,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.InventoryHolder;
@@ -27,6 +28,7 @@ import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
 
+import de.robingrether.mcts.io.UpdateCheck;
 import de.robingrether.util.ObjectUtil;
 
 public class EventListener implements Listener {
@@ -36,6 +38,14 @@ public class EventListener implements Listener {
 	
 	public EventListener(MinecraftTrainSimulator plugin) {
 		this.plugin = plugin;
+	}
+	
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
+		if(player.hasPermission("MCTS.update") && plugin.configuration.UPDATE_CHECK) {
+			plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, new UpdateCheck(plugin, player, plugin.configuration.UPDATE_DOWNLOAD), 20L);
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
