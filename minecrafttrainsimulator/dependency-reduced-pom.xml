@@ -4,7 +4,7 @@
   <groupId>de.robingrether.mcts</groupId>
   <artifactId>minecrafttrainsimulator</artifactId>
   <name>MinecraftTrainSimulator</name>
-  <version>2.1.1-SNAPSHOT</version>
+  <version>2.1.1</version>
   <build>
     <extensions>
       <extension>
@@ -69,12 +69,16 @@
       <id>robingrether-repo</id>
       <url>http://repo.robingrether.de/</url>
     </repository>
+    <repository>
+      <id>MG-Dev Jenkins CI Maven Repository</id>
+      <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.12-R0.1-SNAPSHOT</version>
+      <version>1.12.1-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -106,16 +110,14 @@
     <dependency>
       <groupId>com.bergerkiller.bukkit</groupId>
       <artifactId>BKCommonLib</artifactId>
-      <version>1.12-v1</version>
-      <scope>system</scope>
-      <systemPath>D:\Users\priva\Documents\Java\MinecraftTrainSimulator\minecrafttrainsimulator/../../workspace/Libraries/BKCommonLib-1.12-v1.jar</systemPath>
+      <version>1.12.1-v1</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.bergerkiller.bukkit</groupId>
       <artifactId>TrainCarts</artifactId>
-      <version>1.11.2-v2</version>
-      <scope>system</scope>
-      <systemPath>D:\Users\priva\Documents\Java\MinecraftTrainSimulator\minecrafttrainsimulator/../../workspace/Libraries/TrainCarts-1.11.2-v2.jar</systemPath>
+      <version>1.12.1-v1</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <distributionManagement>
