@@ -20,7 +20,7 @@ public abstract class Train {
 	protected MinecartGroup minecarts;
 	private Player leader;
 	private int direction;
-	private BukkitRunnable thread;
+	private Accelerator accelerator;
 	protected int status;
 	private MapView controlPanel;
 	private double maxSpeed = 100.0;
@@ -29,7 +29,7 @@ public abstract class Train {
 		this.minecarts = minecarts;
 		this.leader = null;
 		this.direction = 0;
-		this.thread = null;
+		this.accelerator = null;
 		this.status = 0;
 		this.controlPanel = controlPanel;
 		initTrainProperties();
@@ -103,17 +103,17 @@ public abstract class Train {
 		}
 		terminate();
 		if(status > 0) {
-			thread = new Accelerator(this, status);
+			accelerator = new Accelerator(this, getSpeedLimit() * status / 4.0, status);
 			if(leader != null && playEffect) {
 				leader.getWorld().playEffect(leader.getLocation(), Effect.DOOR_TOGGLE, 0);
 			}
-			thread.runTaskTimer(MinecraftTrainSimulator.getInstance(), 1L, 1L);
+			accelerator.runTaskTimer(MinecraftTrainSimulator.getInstance(), 1L, 1L);
 		} else if(status < 0) {
-			thread = new Brake(this, -status);
+			accelerator = new Accelerator(this, 0.0, -status);
 			if(leader != null && playEffect) {
 				leader.getWorld().playEffect(leader.getLocation(), Effect.DOOR_TOGGLE, 0);
 			}
-			thread.runTaskTimer(MinecraftTrainSimulator.getInstance(), 1L, 1L);
+			accelerator.runTaskTimer(MinecraftTrainSimulator.getInstance(), 1L, 1L);
 		}
 		this.status = status;
 	}
@@ -127,12 +127,12 @@ public abstract class Train {
 	}
 	
 	public boolean isAccelerating() {
-		return thread instanceof Accelerator && hasFuel();
+		return accelerator.getTargetVelocity() != 0.0 && hasFuel();
 	}
 	
 	public void terminate() {
-		if(thread != null) {
-			thread.cancel();
+		if(accelerator != null) {
+			accelerator.cancel();
 		}
 	}
 	
