@@ -136,7 +136,7 @@ public abstract class Train {
 		}
 	}
 	
-	public short getMapId() {
+	public int getMapId() {
 		return controlPanel.getId();
 	}
 	

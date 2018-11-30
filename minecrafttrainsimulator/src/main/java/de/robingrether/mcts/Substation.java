@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.data.Powerable;
 
 public class Substation {
 	
@@ -97,12 +98,14 @@ public class Substation {
 		blocks[8] = location.clone().add(blocks[3].getBlockX() - blocks[0].getBlockX(), 3, blocks[3].getBlockZ() - blocks[0].getBlockZ());
 		blocks[1].getBlock().setType(Material.IRON_BLOCK);
 		blocks[2].getBlock().setType(Material.LEVER);
-		blocks[2].getBlock().setData((byte)5);
+		Powerable lever = (Powerable)blocks[2].getBlock().getBlockData();
+		lever.setPowered(false);
+		blocks[2].getBlock().setBlockData(lever);
 		Material fence = blocks[3].getBlock().getType();
 		blocks[4].getBlock().setType(fence);
 		blocks[5].getBlock().setType(fence);
 		blocks[6].getBlock().setType(fence);
-		blocks[7].getBlock().setType(Material.IRON_FENCE);
+		blocks[7].getBlock().setType(Material.IRON_BARS);
 		blocks[8].getBlock().setType(fence);
 		created = true;
 		return true;
@@ -149,7 +152,9 @@ public class Substation {
 				switch(matcher.group(3)) {
 					case "on":
 						substation.turnOn();
-						substation.blocks[2].getBlock().setData((byte)13);
+						Powerable lever = (Powerable)substation.blocks[2].getBlock().getBlockData();
+						lever.setPowered(true);
+						substation.blocks[2].getBlock().setBlockData(lever);
 						break;
 					case "off":
 						substation.turnOff();

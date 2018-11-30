@@ -24,6 +24,7 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
@@ -61,7 +62,7 @@ public class EventListener implements Listener {
 						player.sendMessage(ChatColor.GOLD + "Now place a fence (wooden or netherbrick) next to the rail.");
 					}
 				}
-			} else if(ObjectUtil.equals(placed.getType(), Material.FENCE, Material.BIRCH_FENCE, Material.ACACIA_FENCE, Material.DARK_OAK_FENCE, Material.JUNGLE_FENCE, Material.SPRUCE_FENCE, Material.NETHER_FENCE)) {
+			} else if(ObjectUtil.equals(placed.getType(), Material.OAK_FENCE, Material.BIRCH_FENCE, Material.ACACIA_FENCE, Material.DARK_OAK_FENCE, Material.JUNGLE_FENCE, Material.SPRUCE_FENCE, Material.NETHER_BRICK_FENCE)) {
 				if(substations.containsKey(player.getName().toLowerCase(Locale.ENGLISH))) {
 					Substation substation = substations.get(player.getName().toLowerCase(Locale.ENGLISH));
 					if(substation.isRedstoneBlockPlaced()) {
@@ -76,7 +77,7 @@ public class EventListener implements Listener {
 						}
 					}
 				}
-			} else if(placed.getType().equals(Material.IRON_FENCE)) {
+			} else if(placed.getType().equals(Material.IRON_BARS)) {
 				Bukkit.getScheduler().runTaskLater(plugin, new UpdateCatenaryRunnable(), 1L);
 			}
 		}
@@ -87,10 +88,10 @@ public class EventListener implements Listener {
 		if(!event.isCancelled()) {
 			Block broken = event.getBlock();
 			Player player = event.getPlayer();
-			if(broken.getType().equals(Material.IRON_FENCE)) {
+			if(broken.getType().equals(Material.IRON_BARS)) {
 				Bukkit.getScheduler().runTaskLater(plugin, new UpdateCatenaryRunnable(), 1L);
 			}
-			if(ObjectUtil.equals(broken.getType(), Material.FENCE, Material.BIRCH_FENCE, Material.ACACIA_FENCE, Material.DARK_OAK_FENCE, Material.JUNGLE_FENCE, Material.SPRUCE_FENCE, Material.NETHER_FENCE, Material.REDSTONE_BLOCK, Material.IRON_FENCE, Material.IRON_BLOCK, Material.LEVER)) {
+			if(ObjectUtil.equals(broken.getType(), Material.OAK_FENCE, Material.BIRCH_FENCE, Material.ACACIA_FENCE, Material.DARK_OAK_FENCE, Material.JUNGLE_FENCE, Material.SPRUCE_FENCE, Material.NETHER_BRICK_FENCE, Material.REDSTONE_BLOCK, Material.IRON_BARS, Material.IRON_BLOCK, Material.LEVER)) {
 				for(Substation substation : plugin.substations.values()) {
 					if(substation.isAt(broken.getLocation())) {
 						substation.delete();
@@ -182,7 +183,9 @@ public class EventListener implements Listener {
 					PlayerInventory inventory = player.getInventory();
 					int slot = inventory.first(Material.MAP);
 					if(slot > -1) {
-						inventory.getItem(slot).setDurability(train.getMapId());
+						MapMeta meta = (MapMeta)inventory.getItem(slot).getItemMeta();
+						meta.setMapId(train.getMapId());
+						inventory.getItem(slot).setItemMeta(meta);
 					}
 				}
 			}

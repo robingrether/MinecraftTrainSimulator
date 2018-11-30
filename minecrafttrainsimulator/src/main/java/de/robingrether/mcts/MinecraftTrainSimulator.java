@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-import org.bstats.Metrics;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -28,6 +28,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -48,12 +49,12 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	private static MinecraftTrainSimulator instance;
 	
 	Configuration configuration;
-	private Set<Train> trains = new HashSet<Train>();
-	Map<String, Substation> substations = new ConcurrentHashMap<String, Substation>();
-	Set<Location> catenary;
-	
 	private EventListener listener;
 	private Metrics metrics;
+	
+	private Set<Train> trains = new HashSet<Train>(); // TODO: array list?
+	Map<String, Substation> substations = new ConcurrentHashMap<String, Substation>();
+	Set<Location> catenary;
 	
 	public void onEnable() {
 		instance = this;
@@ -71,33 +72,9 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 			TrainMapRenderer.unitOfSpeed = UnitOfSpeed.KILOMETRES_PER_HOUR;
 		}
 		metrics = new Metrics(this);
-		metrics.addCustomChart(new Metrics.SingleLineChart("steamTrains") {
-			
-			public int getValue() {
-				int c = 0;
-				for(Train train : trains)
-					if(train instanceof SteamTrain) c++;
-				return c;
-			}
-			
-		});
-		metrics.addCustomChart(new Metrics.SingleLineChart("electricTrains") {
-			
-			public int getValue() {
-				int c = 0;
-				for(Train train : trains)
-					if(train instanceof ElectricTrain) c++;
-				return c;
-			}
-			
-		});
-		metrics.addCustomChart(new Metrics.SingleLineChart("substations") {
-			
-			public int getValue() {
-				return substations.size();
-			}
-			
-		});
+		metrics.addCustomChart(new Metrics.SingleLineChart("steamTrains", () -> {int c = 0; for(Train train : trains) if(train instanceof SteamTrain) c++; return c;}));
+		metrics.addCustomChart(new Metrics.SingleLineChart("electricTrains", () -> {int c = 0; for(Train train : trains) if(train instanceof ElectricTrain) c++; return c;}));
+		metrics.addCustomChart(new Metrics.SingleLineChart("substations", () -> substations.size()));
 		updateCatenary();
 		if(configuration.UPDATE_CHECK) {
 			getServer().getScheduler().runTaskLaterAsynchronously(this, new UpdateCheck(this, getServer().getConsoleSender(), configuration.UPDATE_DOWNLOAD), 20L);
@@ -129,10 +106,10 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 					} else {
 						Train train = getTrain(player);
 						if(train instanceof SteamTrain) {
-							if(SteamTrain.isFuel(player.getItemInHand().getType())) {
-								int fuel = player.getItemInHand().getAmount() * 2000;
+							if(SteamTrain.isFuel(player.getInventory().getItemInMainHand().getType())) {
+								int fuel = player.getInventory().getItemInMainHand().getAmount() * 2000;
 								train.addFuel(fuel);
-								player.setItemInHand(null);
+								player.getInventory().setItemInMainHand(null);
 								sender.sendMessage(ChatColor.GOLD + "Added fuel to the train.");
 							} else {
 								sender.sendMessage(ChatColor.RED + "You have to hold coal in your hand.");
@@ -175,7 +152,9 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 								PlayerInventory inventory = player.getInventory();
 								int slot = inventory.first(Material.MAP);
 								if(slot > -1) {
-									inventory.getItem(slot).setDurability(train.getMapId());
+									MapMeta meta = (MapMeta)inventory.getItem(slot).getItemMeta();
+									meta.setMapId(train.getMapId());
+									inventory.getItem(slot).setItemMeta(meta);
 								}
 							}
 						} else if(args[1].equalsIgnoreCase("electric")) {
@@ -194,7 +173,9 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 								PlayerInventory inventory = player.getInventory();
 								int slot = inventory.first(Material.MAP);
 								if(slot > -1) {
-									inventory.getItem(slot).setDurability(train.getMapId());
+									MapMeta meta = (MapMeta)inventory.getItem(slot).getItemMeta();
+									meta.setMapId(train.getMapId());
+									inventory.getItem(slot).setItemMeta(meta);
 								}
 							}
 						} else {
@@ -419,7 +400,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 				}
 				lastCatenary.clear();
 				for(Block block : neighbors) {
-					if(block.getType().equals(Material.IRON_FENCE) && !substationCatenary.contains(block.getLocation())) {
+					if(block.getType().equals(Material.IRON_BARS) && !substationCatenary.contains(block.getLocation())) {
 						catenary.add(block.getLocation());
 						lastCatenary.add(block);
 						substationCatenary.add(block.getLocation());
