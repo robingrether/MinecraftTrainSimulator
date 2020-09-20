@@ -23,8 +23,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
@@ -180,13 +178,7 @@ public class EventListener implements Listener {
 				Player player = (Player)event.getEntered();
 				Train train = plugin.getTrain(player, false);
 				if(train != null) {
-					PlayerInventory inventory = player.getInventory();
-					int slot = inventory.first(Material.MAP);
-					if(slot > -1) {
-						MapMeta meta = (MapMeta)inventory.getItem(slot).getItemMeta();
-						meta.setMapId(train.getMapId());
-						inventory.getItem(slot).setItemMeta(meta);
-					}
+					plugin.giveControlPanelTo(player, train);
 				}
 			}
 		}

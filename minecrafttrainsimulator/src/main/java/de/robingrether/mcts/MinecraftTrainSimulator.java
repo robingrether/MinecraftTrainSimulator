@@ -27,7 +27,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -149,13 +149,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 									train.setLeader(player);
 								}
 								sender.sendMessage(ChatColor.GOLD + "Created steam train.");
-								PlayerInventory inventory = player.getInventory();
-								int slot = inventory.first(Material.MAP);
-								if(slot > -1) {
-									MapMeta meta = (MapMeta)inventory.getItem(slot).getItemMeta();
-									meta.setMapId(train.getMapId());
-									inventory.getItem(slot).setItemMeta(meta);
-								}
+								giveControlPanelTo(player, train);
 							}
 						} else if(args[1].equalsIgnoreCase("electric")) {
 							MinecartGroup minecarts = MinecartGroup.get(player.getVehicle());
@@ -170,13 +164,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 									train.setLeader(player);
 								}
 								sender.sendMessage(ChatColor.GOLD + "Created electric train.");
-								PlayerInventory inventory = player.getInventory();
-								int slot = inventory.first(Material.MAP);
-								if(slot > -1) {
-									MapMeta meta = (MapMeta)inventory.getItem(slot).getItemMeta();
-									meta.setMapId(train.getMapId());
-									inventory.getItem(slot).setItemMeta(meta);
-								}
+								giveControlPanelTo(player, train);
 							}
 						} else {
 							sender.sendMessage(ChatColor.RED + "Wrong usage: /mcts create <coal/electric>");
@@ -470,6 +458,17 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	private MapView createNewMap(World world) {
 		MapView map = getServer().createMap(world);
 		return map;
+	}
+	
+	void giveControlPanelTo(Player player, Train train) {
+		ItemStack mapItem = player.getInventory().getItemInMainHand();
+		if((Material.MAP.equals(mapItem.getType()) || Material.FILLED_MAP.equals(mapItem.getType())) && mapItem.getAmount() == 1) {
+			ItemStack controlPanelItem = new ItemStack(Material.FILLED_MAP);
+			MapMeta meta = (MapMeta)controlPanelItem.getItemMeta();
+			meta.setMapView(train.getControlPanel());
+			controlPanelItem.setItemMeta(meta);
+			player.getInventory().setItemInMainHand(controlPanelItem);
+		}
 	}
 	
 	private void terminateTrains() {

@@ -5,7 +5,6 @@ import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.bergerkiller.bukkit.tc.CollisionMode;
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
@@ -136,8 +135,8 @@ public abstract class Train {
 		}
 	}
 	
-	public int getMapId() {
-		return controlPanel.getId();
+	public MapView getControlPanel() {
+		return controlPanel;
 	}
 	
 	private void initTrainProperties() {
