@@ -2,6 +2,7 @@ name: MinecraftTrainSimulator
 main: de.robingrether.mcts.MinecraftTrainSimulator
 version: ${project.version}
 author: RobinGrether
+api-version: 1.13
 prefix: MCTS
 depend: [BKCommonLib, Train_Carts]
 commands:

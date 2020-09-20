@@ -13,30 +13,25 @@ import java.net.URLConnection;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Locale;
 import java.util.logging.Level;
-
-import javax.xml.bind.DatatypeConverter;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+
+import com.google.gson.Gson;
 
 import de.robingrether.mcts.MinecraftTrainSimulator;
 import de.robingrether.util.ObjectUtil;
+import de.robingrether.util.StringUtil;
 
 public class UpdateCheck implements Runnable {
 	
 	public static final int PROJECT_ID = 64141;
 	public static final String API_URL = "https://api.curseforge.com/servermods/files?projectIds=";
-	public static final String API_CHECKSUM = "md5";
-	public static final String API_DOWNLOAD_URL = "downloadUrl";
-	public static final String API_FILE_NAME = "fileName";
-	public static final String API_GAME_VERSION = "gameVersion";
-	public static final String API_NAME = "name";
-	public static final String API_RELEASE_TYPE = "releaseType";
+	
+	public static class PluginVersion {
+		public String md5, downloadUrl, fileName, gameVersion, name, releaseType;
+	}
 	
 	private MinecraftTrainSimulator plugin;
 	private String pluginVersion;
@@ -87,12 +82,18 @@ public class UpdateCheck implements Runnable {
 			connection.setDoOutput(true);
 			reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			String response = reader.readLine();
-			JSONArray array = (JSONArray)JSONValue.parse(response);
+			PluginVersion[] array = new Gson().fromJson(response, PluginVersion[].class);
 			latestVersion = null;
-			JSONObject object = (JSONObject)array.get(array.size() - 1);
-			latestVersion = (String)object.get(API_NAME);
-			downloadUrl = ((String)object.get(API_DOWNLOAD_URL));
-			checksum = (String)object.get(API_CHECKSUM);
+			int latestVersionNumber = 0;
+			for(PluginVersion pluginVersion : array) {
+				int versionNumber = extractVersionNumber(pluginVersion.name);
+				if(versionNumber > latestVersionNumber) {
+					latestVersionNumber = versionNumber;
+					latestVersion = pluginVersion.name;
+					downloadUrl = pluginVersion.downloadUrl;
+					checksum = pluginVersion.md5;
+				}
+			}
 		} catch(Exception e) {
 			plugin.getLogger().log(Level.WARNING, "Update checking failed: " + e.getClass().getSimpleName());
 		} finally {
@@ -139,7 +140,7 @@ public class UpdateCheck implements Runnable {
 				}
 				input.close();
 				output.close();
-				if(DatatypeConverter.printHexBinary(messageDigest.digest()).toLowerCase(Locale.ENGLISH).equals(checksum.toLowerCase(Locale.ENGLISH))) {
+				if(StringUtil.bytesToHex(messageDigest.digest()).equalsIgnoreCase(this.checksum)) {
 					toBeNotified.sendMessage(ChatColor.GOLD + "[MCTS] Download succeeded. (Restart server to apply update)");
 				} else {
 					newFile.delete();
@@ -163,6 +164,24 @@ public class UpdateCheck implements Runnable {
 					}
 				}
 			}
+		}
+	}
+	
+	public static int extractVersionNumber(String versionString) {
+		try {
+			String[] numbers = versionString.split(" |-")[1].split("\\.");
+			int versionNumber = 0;
+			for(int i = 0; i < numbers.length; i++) {
+				if(numbers[i].length() > 2)
+					return 0;
+				
+				versionNumber += Integer.parseInt(numbers[i]) * Math.pow(10.0, 2 * (numbers.length - i - 1));
+			}
+			if(versionString.contains("SNAPSHOT"))
+				versionNumber--;
+			return versionNumber;
+		} catch(ArrayIndexOutOfBoundsException|NumberFormatException e) {
+			return 0;
 		}
 	}
 	

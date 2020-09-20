@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.robingrether.mcts</groupId>
   <artifactId>minecrafttrainsimulator</artifactId>
-  <version>2.1.2-SNAPSHOT</version>
+  <version>3.0.1-SNAPSHOT</version>
   <name>MinecraftTrainSimulator</name>
   
   <properties>
@@ -32,7 +32,7 @@
   	<dependency>
   		<groupId>org.spigotmc</groupId>
   		<artifactId>spigot-api</artifactId>
-  		<version>1.13.2-R0.1-SNAPSHOT</version>
+  		<version>1.16.2-R0.1-SNAPSHOT</version>
   		<scope>provided</scope>
   	</dependency>
   	<dependency>
@@ -50,13 +50,13 @@
   	<dependency>
   		<groupId>com.bergerkiller.bukkit</groupId>
   		<artifactId>BKCommonLib</artifactId>
-  		<version>1.13.2-v1-SNAPSHOT</version>
+  		<version>1.16.2-v1-SNAPSHOT</version>
   		<scope>provided</scope>
   	</dependency>
   	<dependency>
   		<groupId>com.bergerkiller.bukkit</groupId>
   		<artifactId>TrainCarts</artifactId>
-  		<version>1.13.1-v2-SNAPSHOT</version>
+  		<version>1.16.1-v1-SNAPSHOT</version>
   		<scope>provided</scope>
   	</dependency>
   </dependencies>

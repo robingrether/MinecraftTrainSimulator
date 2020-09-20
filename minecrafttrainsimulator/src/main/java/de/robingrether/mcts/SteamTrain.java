@@ -54,6 +54,7 @@ public class SteamTrain extends Train {
 	
 	static {
 		newFuel(Material.COAL);
+		newFuel(Material.CHARCOAL);
 	}
 	
 }
