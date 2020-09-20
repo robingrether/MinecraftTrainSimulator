@@ -7,7 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -54,7 +54,7 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	
 	private Set<Train> trains = new HashSet<Train>(); // TODO: array list?
 	Map<String, Substation> substations = new ConcurrentHashMap<String, Substation>();
-	Set<Location> catenary;
+	Map<Location, Integer> catenary;
 	
 	public void onEnable() {
 		instance = this;
@@ -382,40 +382,61 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 	}
 	
 	public void updateCatenary() {
-		catenary = new HashSet<Location>();
+		catenary = new HashMap<Location, Integer>();
 		for(Substation substation : substations.values()) {
 			if(!substation.isTurnedOn()) {
 				continue;
 			}
-			Set<Block> lastCatenary = new HashSet<Block>(), neighbors = new HashSet<Block>();
-			Set<Location> substationCatenary = new HashSet<Location>();
-			int distance = 1;
-			catenary.add(substation.getIronFenceLocation());
-			lastCatenary.add(substation.getIronFenceLocation().getBlock());
-			substationCatenary.add(substation.getIronFenceLocation());
-			while(distance < substation.getVoltage() / 10) {
+			int power = substation.getVoltage();
+			Set<Location> lastCatenary = new HashSet<Location>(), neighbors = new HashSet<Location>();
+			catenary.put(substation.getIronFenceLocation(), power);
+			lastCatenary.add(substation.getIronFenceLocation());
+			
+			while(power > 0) {
 				neighbors.clear();
-				for(Block block : lastCatenary) {
-					neighbors.addAll(Arrays.asList(getNeighbors(block)));
-				}
-				lastCatenary.clear();
-				for(Block block : neighbors) {
-					if(block.getType().equals(Material.IRON_BARS) && !substationCatenary.contains(block.getLocation())) {
-						catenary.add(block.getLocation());
-						lastCatenary.add(block);
-						substationCatenary.add(block.getLocation());
+				for(Location location : lastCatenary) {
+					Block block = location.getBlock();
+					for(Block neighbor : new Block[] {block.getRelative(BlockFace.UP), block.getRelative(BlockFace.DOWN), block.getRelative(BlockFace.EAST), block.getRelative(BlockFace.WEST), block.getRelative(BlockFace.NORTH), block.getRelative(BlockFace.SOUTH)}) {
+						neighbors.add(neighbor.getLocation());
 					}
 				}
-				if(lastCatenary.isEmpty()) {
-					break;
+				lastCatenary.clear();
+				for(Location location : neighbors) {
+					if(location.getBlock().getType().equals(Material.IRON_BARS)) {
+						if(!catenary.containsKey(location) || catenary.get(location) < power) {
+							catenary.put(location, power);
+							lastCatenary.add(location);
+						}
+					}
 				}
-				distance++;
+				if(lastCatenary.isEmpty()) break;
+				power -= 10;
 			}
+//			Set<Block> lastCatenary = new HashSet<Block>(), neighbors = new HashSet<Block>();
+//			Set<Location> substationCatenary = new HashSet<Location>();
+//			int distance = 1;
+//			catenary.add(substation.getIronFenceLocation());
+//			lastCatenary.add(substation.getIronFenceLocation().getBlock());
+//			substationCatenary.add(substation.getIronFenceLocation());
+//			while(distance < substation.getVoltage() / 10) {
+//				neighbors.clear();
+//				for(Block block : lastCatenary) {
+//					neighbors.addAll(Arrays.asList(getNeighbors(block)));
+//				}
+//				lastCatenary.clear();
+//				for(Block block : neighbors) {
+//					if(block.getType().equals(Material.IRON_BARS) && !substationCatenary.contains(block.getLocation())) {
+//						catenary.add(block.getLocation());
+//						lastCatenary.add(block);
+//						substationCatenary.add(block.getLocation());
+//					}
+//				}
+//				if(lastCatenary.isEmpty()) {
+//					break;
+//				}
+//				distance++;
+//			}
 		}
-	}
-	
-	private Block[] getNeighbors(Block block) {
-		return new Block[]{block.getRelative(BlockFace.UP), block.getRelative(BlockFace.DOWN), block.getRelative(BlockFace.EAST), block.getRelative(BlockFace.WEST), block.getRelative(BlockFace.NORTH), block.getRelative(BlockFace.SOUTH)};
 	}
 	
 	public Train getTrain(Player player) {

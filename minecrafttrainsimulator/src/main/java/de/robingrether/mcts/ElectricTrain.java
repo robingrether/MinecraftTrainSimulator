@@ -17,7 +17,7 @@ public class ElectricTrain extends Train {
 	
 	public boolean consumeFuel() {
 		for(MinecartMember<?> minecart : minecarts) {
-			if(MinecraftTrainSimulator.getInstance().catenary.contains(minecart.getBlock(0, 2, 0).getLocation())) {
+			if(MinecraftTrainSimulator.getInstance().catenary.containsKey(minecart.getBlock(0, MinecraftTrainSimulator.getInstance().configuration.CATENARY_HEIGHT, 0).getLocation())) {
 				return true;
 			}
 		}
@@ -30,7 +30,7 @@ public class ElectricTrain extends Train {
 	
 	public boolean hasFuel() {
 		for(MinecartMember<?> minecart : minecarts) {
-			if(MinecraftTrainSimulator.getInstance().catenary.contains(minecart.getBlock(0, 2, 0).getLocation())) {
+			if(MinecraftTrainSimulator.getInstance().catenary.containsKey(minecart.getBlock(0, MinecraftTrainSimulator.getInstance().configuration.CATENARY_HEIGHT, 0).getLocation())) {
 				return true;
 			}
 		}
