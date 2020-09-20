@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -65,12 +66,25 @@ public class MinecraftTrainSimulator extends JavaPlugin {
 		configuration = new Configuration(this);
 		configuration.loadData();
 		configuration.saveData();
-		loadData();
 		Images.init();
 		TrainMapRenderer.unitOfSpeed = UnitOfSpeed.fromString(configuration.UNIT_OF_SPEED);
 		if(TrainMapRenderer.unitOfSpeed == null) {
 			TrainMapRenderer.unitOfSpeed = UnitOfSpeed.KILOMETRES_PER_HOUR;
 		}
+		if(configuration.CATENARY_HEIGHT >= 2) {
+			Substation.CATENARY_HEIGHT = configuration.CATENARY_HEIGHT;
+		}
+		if(Material.getMaterial(configuration.CATENARY_MATERIAL) != null && Material.getMaterial(configuration.CATENARY_MATERIAL).isBlock()) {
+			Substation.CATENARY_MATERIAL = Material.getMaterial(configuration.CATENARY_MATERIAL);
+		}
+		if(Material.getMaterial(configuration.CATENARY_SUBSTATION_BOTTOM) != null && Material.getMaterial(configuration.CATENARY_SUBSTATION_BOTTOM).isBlock()) {
+			Substation.SUBSTATION_BOTTOM = Material.getMaterial(configuration.CATENARY_SUBSTATION_BOTTOM);
+		}
+		if(Material.getMaterial(configuration.CATENARY_SUBSTATION_TOP) != null && Material.getMaterial(configuration.CATENARY_SUBSTATION_TOP).isSolid()) {
+			Substation.SUBSTATION_TOP = Material.getMaterial(configuration.CATENARY_SUBSTATION_TOP);
+		}
+		Substation.SUBSTATION_SUPPORT = configuration.CATENARY_SUBSTATION_SUPPORT.stream().map(materialName -> Material.getMaterial(materialName)).collect(Collectors.toList());
+		loadData();
 		metrics = new Metrics(this);
 		metrics.addCustomChart(new Metrics.SingleLineChart("steamTrains", () -> {int c = 0; for(Train train : trains) if(train instanceof SteamTrain) c++; return c;}));
 		metrics.addCustomChart(new Metrics.SingleLineChart("electricTrains", () -> {int c = 0; for(Train train : trains) if(train instanceof ElectricTrain) c++; return c;}));

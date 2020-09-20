@@ -52,7 +52,7 @@ public class EventListener implements Listener {
 		if(!event.isCancelled()) {
 			Block placed = event.getBlockPlaced();
 			Player player = event.getPlayer();
-			if(placed.getType().equals(Material.REDSTONE_BLOCK)) {
+			if(placed.getType().equals(Substation.SUBSTATION_BOTTOM)) {
 				if(substations.containsKey(player.getName().toLowerCase(Locale.ENGLISH))) {
 					Substation substation = substations.get(player.getName().toLowerCase(Locale.ENGLISH));
 					if(!substation.isRedstoneBlockPlaced()) {
@@ -60,7 +60,7 @@ public class EventListener implements Listener {
 						player.sendMessage(ChatColor.GOLD + "Now place a fence (wooden or netherbrick) next to the rail.");
 					}
 				}
-			} else if(ObjectUtil.equals(placed.getType(), Material.OAK_FENCE, Material.BIRCH_FENCE, Material.ACACIA_FENCE, Material.DARK_OAK_FENCE, Material.JUNGLE_FENCE, Material.SPRUCE_FENCE, Material.NETHER_BRICK_FENCE)) {
+			} else if(ObjectUtil.equals(placed.getType(), Substation.SUBSTATION_SUPPORT.toArray())) {
 				if(substations.containsKey(player.getName().toLowerCase(Locale.ENGLISH))) {
 					Substation substation = substations.get(player.getName().toLowerCase(Locale.ENGLISH));
 					if(substation.isRedstoneBlockPlaced()) {
@@ -75,7 +75,7 @@ public class EventListener implements Listener {
 						}
 					}
 				}
-			} else if(placed.getType().equals(Material.IRON_BARS)) {
+			} else if(placed.getType().equals(Substation.CATENARY_MATERIAL)) {
 				Bukkit.getScheduler().runTaskLater(plugin, new UpdateCatenaryRunnable(), 1L);
 			}
 		}
@@ -86,10 +86,10 @@ public class EventListener implements Listener {
 		if(!event.isCancelled()) {
 			Block broken = event.getBlock();
 			Player player = event.getPlayer();
-			if(broken.getType().equals(Material.IRON_BARS)) {
+			if(broken.getType().equals(Substation.CATENARY_MATERIAL)) {
 				Bukkit.getScheduler().runTaskLater(plugin, new UpdateCatenaryRunnable(), 1L);
 			}
-			if(ObjectUtil.equals(broken.getType(), Material.OAK_FENCE, Material.BIRCH_FENCE, Material.ACACIA_FENCE, Material.DARK_OAK_FENCE, Material.JUNGLE_FENCE, Material.SPRUCE_FENCE, Material.NETHER_BRICK_FENCE, Material.REDSTONE_BLOCK, Material.IRON_BARS, Material.IRON_BLOCK, Material.LEVER)) {
+			if(ObjectUtil.equals(broken.getType(), Substation.SUBSTATION_SUPPORT.toArray()) || broken.getType().equals(Substation.CATENARY_MATERIAL) || broken.getType().equals(Substation.SUBSTATION_BOTTOM) || broken.getType().equals(Substation.SUBSTATION_TOP) || broken.getType().equals(Material.LEVER)) {
 				for(Substation substation : plugin.substations.values()) {
 					if(substation.isAt(broken.getLocation())) {
 						substation.delete();

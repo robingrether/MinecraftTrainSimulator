@@ -6,6 +6,28 @@ status-panel:
    # Defaults to kilometres per hour, if the given value is invalid
    unit-of-speed: UNIT_OF_SPEED
 
+# Settings affecting the catenary
+catenary:
+   
+   # Height of catenary lines above the rails
+   height: CATENARY_HEIGHT
+   
+   # Material that the catenary lines must be made of
+   material: CATENARY_MATERIAL
+   
+   # Settings for the substations
+   substation:
+      
+      # Material type of the bottom block
+      bottom-block: CATENARY_SUBSTATION_BOTTOM
+      
+      # Material type of the top block
+      # Must be a solid block type because a lever is to be placed on top!
+      top-block: CATENARY_SUBSTATION_TOP
+      
+      # List of material types that the substation's catenary support may be made out of (usually different kinds of fences)
+      support-blocks: CATENARY_SUBSTATION_SUPPORT
+
 # Settings affecting the update checking feature
 updates:
    
