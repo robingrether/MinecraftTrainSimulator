@@ -144,12 +144,7 @@ public abstract class Train {
 		properties.playerCollision = CollisionMode.PUSH;
 		properties.miscCollision = CollisionMode.PUSH;
 		properties.trainCollision = CollisionMode.PUSH;
-		for(MinecartMember<?> minecart : minecarts) {
-			double maxSpeed = minecart.getEntity().getMaxSpeed();
-			if(maxSpeed < this.maxSpeed) {
-				this.maxSpeed = maxSpeed;
-			}
-		}
+		this.maxSpeed = properties.getSpeedLimit();
 	}
 	
 	private void initMap() {
